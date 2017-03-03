@@ -19,13 +19,25 @@ from nltk.corpus import gutenberg
 from nltk.tokenize import sent_tokenize
 from nltk.tokenize import word_tokenize
 from nltk import ngrams
+from nltk.tokenize import RegexpTokenizer
 #n will be added by the user
 
 
-europarl= gutenberg.raw('europarl.txt')
-count=0
-for i in gutenberg.words('europarl.txt'):
-    print i
+f = open("europarl.txt")
+europarl = f.readlines()
+
+europarlg=gutenberg.raw("europarl.txt")
+sentences= [sent for sent in sent_tokenize(europarlg[99:10005])]
+words=[word_tokenize(w) for w in sentences]
+lista= []
+for i in words:
+    lista.extend(filter(lambda word: word not in ",-.'", i))
+
+
+print len(lista)
+
+#for i in gutenberg.words('europarl.txt'):
+ #   print i
 #sentences = [sent for sent in sent_tokenize(europarl)]
 #print('europarl sample: {0}'.format(europarl[117:300]))
 #word_sequences = [word_tokenize(sentence) for sentence in sentences]
