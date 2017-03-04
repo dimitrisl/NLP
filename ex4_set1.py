@@ -42,5 +42,7 @@ for token in lista:
     else:
         counter[token]+=1
 #find the occurences of each token
-sorted_dict = [sorted(x,y) for y,x in counter.items()]
+sorted_dict = sorted([(x,y) for y,x in counter.items()],reverse=True)
+print sorted_dict
+
 #with this way i sort the first item of the tuple
