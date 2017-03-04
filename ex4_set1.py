@@ -15,7 +15,7 @@
 # (http://www.nltk.org/) or other tools for sentence splitting, tokenization, and counting ngrams,
 # but otherwise you should write your own code.
 
-from nltk.corpus import gutenberg
+#from nltk.corpus import gutenberg
 from nltk.tokenize import sent_tokenize
 from nltk.tokenize import word_tokenize
 from nltk import ngrams
@@ -24,22 +24,23 @@ from nltk.tokenize import RegexpTokenizer
 
 
 f = open("europarl.txt")
-europarl = f.readlines()
-
-europarlg=gutenberg.raw("europarl.txt")
+europarlg = f.read() #it reads bytes so we wont have a problem with any other language
+#europarlg=gutenberg.raw("europarl.txt")
 sentences= [sent for sent in sent_tokenize(europarlg[99:10005])]
 words=[word_tokenize(w) for w in sentences]
 lista= []
 for i in words:
     lista.extend(filter(lambda word: word not in ",-.'", i))
 
-
 print len(lista)
+print len(set(lista))
+counter ={}
 
-#for i in gutenberg.words('europarl.txt'):
- #   print i
-#sentences = [sent for sent in sent_tokenize(europarl)]
-#print('europarl sample: {0}'.format(europarl[117:300]))
-#word_sequences = [word_tokenize(sentence) for sentence in sentences]
-
-#print word_sequences[0][2]
+for token in lista:
+    if token not in counter.keys():
+        counter[token] = 1
+    else:
+        counter[token]+=1
+#find the occurences of each token
+sorted_dict = [sorted(x,y) for y,x in counter.items()]
+#with this way i sort the first item of the tuple
