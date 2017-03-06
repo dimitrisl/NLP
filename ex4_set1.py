@@ -20,16 +20,16 @@ from nltk.tokenize import sent_tokenize
 from nltk.tokenize import word_tokenize
 from nltk import ngrams
 from nltk.probability import FreqDist
+import codecs
 #n will be added by the user
 
-
-f = open("europarl.txt")
+f = codecs.open("europarl.txt","r","utf-8")
 europarlg = f.read() #it reads bytes so we wont have a problem with any other language
-sentences= [sent for sent in sent_tokenize(europarlg[99:1005])]
+sentences= [sent for sent in sent_tokenize(europarlg[99:1000005])]
 words=[word_tokenize(w) for w in sentences]
 lista= []
 fd1 = FreqDist()
-for word in word_tokenize(europarlg[99:1005]):
+for word in word_tokenize(europarlg[99:10005]):
     fd1[word]+=1
 for i in fd1:
     lista.append([i,fd1[i]])       
