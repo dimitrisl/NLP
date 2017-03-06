@@ -28,6 +28,7 @@ europarlg = f.read() #it reads bytes so we wont have a problem with any other la
 sentences= [sent for sent in sent_tokenize(europarlg[99:1005])]
 words=[word_tokenize(w) for w in sentences]
 lista= []
+fd1 = FreqDist()
 for word in word_tokenize(europarlg[99:1005]):
     fd1[word]+=1
 for i in fd1:
