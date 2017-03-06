@@ -15,7 +15,6 @@
 # (http://www.nltk.org/) or other tools for sentence splitting, tokenization, and counting ngrams,
 # but otherwise you should write your own code.
 
-#from nltk.corpus import gutenberg
 from nltk.tokenize import sent_tokenize
 from nltk.tokenize import word_tokenize
 from nltk import ngrams
@@ -24,7 +23,7 @@ import codecs
 #n will be added by the user
 def find_rare(diction):
     for x in diction:
-        if diction[x]<5:
+        if diction[x]<10:
             diction[x]= '*rare*'
     return diction
 
@@ -40,13 +39,26 @@ for token in words:
         counter[token]= 1
     else:
         counter[token]+=1
-
 #find the occurences of each token
-
 #find and delete rare tokens from dictionary
 
-
 counter= find_rare(counter)
-print counter
+#first we're gonna make the bigrams
+bigrams = ngrams(words,2)
+valid_bigrams = []
 
+counter1 = 0
+counter2 = 0
+for x,y in bigrams:
+    if counter[x]!="*rare*" and counter[y]!="*rare*":
+        valid_bigrams.append((x,y))
 
+trigrams = ngrams(words,3)
+valid_trigrams = []
+for x,y,z in trigrams:
+    if counter[x]!="*rare*" and counter[y]!="*rare*" and counter[z]!="*rare*":
+        valid_trigrams.append((x,y,z))
+
+print "the distinct words are {0}".format(len(set(words)))
+
+print "valid trigrams",len(valid_trigrams),"valid bigrams",len(valid_bigrams),"and words {0}".format(len(words))
