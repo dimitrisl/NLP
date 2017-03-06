@@ -19,30 +19,49 @@
 from nltk.tokenize import sent_tokenize
 from nltk.tokenize import word_tokenize
 from nltk import ngrams
-from nltk.tokenize import RegexpTokenizer
+from nltk.probability import FreqDist
 #n will be added by the user
 
 
 f = open("europarl.txt")
 europarlg = f.read() #it reads bytes so we wont have a problem with any other language
-#europarlg=gutenberg.raw("europarl.txt")
-sentences= [sent for sent in sent_tokenize(europarlg[99:10005])]
+sentences= [sent for sent in sent_tokenize(europarlg[99:1005])]
 words=[word_tokenize(w) for w in sentences]
 lista= []
-for i in words:
-    lista.extend(filter(lambda word: word not in ",-.'", i))
+for word in word_tokenize(europarlg[99:1005]):
+    fd1[word]+=1
+for i in fd1:
+    lista.append([i,fd1[i]])       
 
-print len(lista)
-print len(set(lista))
-counter ={}
+print lista
+#counter ={}
 
-for token in lista:
-    if token not in counter.keys():
-        counter[token] = 1
-    else:
-        counter[token]+=1
+#for token in lista:
+ #   if token not in counter.keys():
+  #      counter[token] = 1
+   # else:
+    #    counter[token]+=1
+
+#print counter
 #find the occurences of each token
-sorted_dict = sorted([(x,y) for y,x in counter.items()],reverse=True)
-print sorted_dict
 
 #with this way i sort the first item of the tuple
+
+#find and delete rare tokens from dictionary
+#def find_rare(diction):
+ #   for x in diction.keys():
+  #      if diction[x]<10:
+   #         diction['*rare*']=diction.pop(x)
+    #for x in diction.keys():
+     #   if x=='*rare*':
+      #      del diction[x]
+   # return diction
+
+#counter= find_rare(counter)
+
+#new_lista=[]
+#for x,y in counter.iteritems():
+ #   new_lista.append(x)
+
+#print new_lista
+
