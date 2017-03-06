@@ -49,14 +49,18 @@ for i in words:
     if counter[i]!="*rare*":
         valid_unigrams.append(i)
 
-bigrams = ngrams(words,2)
+bigrams = ngrams(["#start1"]+words,2)
 for x,y in bigrams:
-    if counter[x]!="*rare*" and counter[y]!="*rare*":
+    if x=="#start1":
+        valid_bigrams.append((x,y))
+    elif counter[x]!="*rare*" and counter[y]!="*rare*":
         valid_bigrams.append((x,y))
 
-trigrams = ngrams(words,3)
+trigrams = ngrams(["#start1","#start2"]+words,3)
 for x,y,z in trigrams:
-    if counter[x]!="*rare*" and counter[y]!="*rare*" and counter[z]!="*rare*":
+    if x =="#start1" or x == "#start2":
+        valid_trigrams.append((x,y,z))
+    elif counter[x]!="*rare*" and counter[y]!="*rare*" and counter[z]!="*rare*":
         valid_trigrams.append((x,y,z))
 
 print "the distinct words are {0}".format(len(set(valid_unigrams))) , "and the valid unigrams",len(valid_unigrams)
