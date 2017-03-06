@@ -22,47 +22,31 @@ from nltk import ngrams
 from nltk.probability import FreqDist
 import codecs
 #n will be added by the user
+def find_rare(diction):
+    for x in diction:
+        if diction[x]<5:
+            diction[x]= '*rare*'
+    return diction
 
 f = codecs.open("europarl.txt","r","utf-8")
 europarlg = f.read() #it reads bytes so we wont have a problem with any other language
-sentences= [sent for sent in sent_tokenize(europarlg[99:1000005])]
+sentences= [sent for sent in sent_tokenize(europarlg[0:90005])]
 words=[word_tokenize(w) for w in sentences]
-lista= []
-fd1 = FreqDist()
-for word in word_tokenize(europarlg[99:10005]):
-    fd1[word]+=1
-for i in fd1:
-    lista.append([i,fd1[i]])       
+words = sum(words,[])  
+counter ={}
+words=[i.lower() for i in words]
+for token in words:
+    if token not in counter.keys():
+        counter[token]= 1
+    else:
+        counter[token]+=1
 
-print lista
-#counter ={}
-
-#for token in lista:
- #   if token not in counter.keys():
-  #      counter[token] = 1
-   # else:
-    #    counter[token]+=1
-
-#print counter
 #find the occurences of each token
 
-#with this way i sort the first item of the tuple
-
 #find and delete rare tokens from dictionary
-#def find_rare(diction):
- #   for x in diction.keys():
-  #      if diction[x]<10:
-   #         diction['*rare*']=diction.pop(x)
-    #for x in diction.keys():
-     #   if x=='*rare*':
-      #      del diction[x]
-   # return diction
 
-#counter= find_rare(counter)
 
-#new_lista=[]
-#for x,y in counter.iteritems():
- #   new_lista.append(x)
+counter= find_rare(counter)
+print counter
 
-#print new_lista
 
