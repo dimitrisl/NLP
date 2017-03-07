@@ -40,8 +40,8 @@ for token in words:
     else:
         counter[token]+=1 #find the occurences of each token
 counter= find_rare(counter) #find and delete rare tokens from dictionary
-counter["#start1"] = 1
-counter["#start2"] = 1
+counter["#start1"]=1
+counter["#start2"]=1
 valid_unigrams = []
 valid_bigrams = []
 valid_trigrams = []
@@ -53,12 +53,25 @@ for i in words:
 bigrams = ngrams(["#start1"]+words,2)
 for x,y in bigrams:
     if counter[x]!="*rare*" and counter[y]!="*rare*":
-        valid_bigrams.append((x,y))
+        if valid_bigrams == []:
+            if x!="#start1":
+                valid_bigrams.append(("#start1",x))
+                valid_bigrams.append((x,y))
+            else:
+                valid_bigrams.append((x,y))
+        else:
+            valid_bigrams.append((x,y))
 
 trigrams = ngrams(["#start1","#start2"]+words,3)
 for x,y,z in trigrams:
     if counter[x]!="*rare*" and counter[y]!="*rare*" and counter[z]!="*rare*":
-        valid_trigrams.append((x,y,z))
+        if valid_trigrams == []:
+            if x!="start1":
+                valid_trigrams.append(("#start1","#start2",x))
+                valid_trigrams.append(("#start2",x,y))
+                valid_trigrams.append((x,y,z))
+        else:
+            valid_trigrams.append((x,y,z))
 
 print "the distinct words are {0}".format(len(set(valid_unigrams))) , "and the valid unigrams",len(valid_unigrams)
 
