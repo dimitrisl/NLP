@@ -79,6 +79,6 @@ print "valid trigrams",len(valid_trigrams),"valid bigrams",len(valid_bigrams),"a
 #laplace smoothing of a word (c(unigram,bigram,etc)+1)/C(unigram,bigram)+|distinct unigrams or bigrams|
 lpuni ={}
 for i in set(valid_unigrams):
-    lpuni[i] = (valid_unigrams.count(i)+1)/(len(words)+len(set(valid_unigrams)))
+    lpuni[i] = (valid_unigrams.count(i)+1)/float(len(words)+len(set(valid_unigrams)))
     
 
