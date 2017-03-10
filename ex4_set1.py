@@ -14,7 +14,7 @@
 # check if the combined model performs better. You are allowed to use NLTK
 # (http://www.nltk.org/) or other tools for sentence splitting, tokenization, and counting ngrams,
 # but otherwise you should write your own code.
-
+from matplotlib.rcsetup import validate_nseq_float
 from nltk.tokenize import sent_tokenize
 from nltk.tokenize import word_tokenize
 from nltk import ngrams
@@ -77,8 +77,12 @@ print "the distinct words are {0}".format(len(set(valid_unigrams))) , "and the v
 print "valid trigrams",len(valid_trigrams),"valid bigrams",len(valid_bigrams),"and words {0}".format(len(words))
 
 #laplace smoothing of a word (c(unigram,bigram,etc)+1)/C(unigram,bigram)+|distinct unigrams or bigrams|
-lpuni ={}
+lpuni = {}
 for i in set(valid_unigrams):
     lpuni[i] = (valid_unigrams.count(i)+1)/float(len(words)+len(set(valid_unigrams)))
-    
-
+lpbi = {}
+for i in set(valid_bigrams):
+    lpbi[i] = (valid_bigrams.count(i)+1)/float(len(words)+len(set(valid_unigrams)))
+lptri = {}
+for i in set(valid_trigrams):
+    lptri[i] = (valid_trigrams.count(i)+1)/float(len(valid_bigrams)+len(set(valid_bigrams)))
