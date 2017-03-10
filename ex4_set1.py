@@ -75,3 +75,10 @@ for x,y,z in trigrams:
 print "the distinct words are {0}".format(len(set(valid_unigrams))) , "and the valid unigrams",len(valid_unigrams)
 
 print "valid trigrams",len(valid_trigrams),"valid bigrams",len(valid_bigrams),"and words {0}".format(len(words))
+
+#laplace smoothing of a word (c(unigram,bigram,etc)+1)/C(unigram,bigram)+|distinct unigrams or bigrams|
+lpuni ={}
+for i in set(valid_unigrams):
+    lpuni[i] = (valid_unigrams.count(i)+1)/(len(words)+len(set(valid_unigrams)))
+    
+
