@@ -73,8 +73,13 @@ lpuni = {}
 for i in set(valid_unigrams):
     lpuni[i] = log((valid_unigrams.count(i)+1)/(float(len(words)+len(set(valid_unigrams)))))
 lpbi = {}
-for i in set(valid_bigrams):
-    lpbi[i] = log((valid_bigrams.count(i)+1)/(float(len(words)+len(set(valid_unigrams)))))
+for (x,y) in set(valid_bigrams):
+    lpbi[(x,y)] = log((valid_bigrams.count((x,y))+1)/(float((valid_unigrams.count(x))+len(set(valid_unigrams)))))
 lptri = {}
-for i in set(valid_trigrams):
-    lptri[i] = log((valid_trigrams.count(i)+1)/(float(len(valid_bigrams)+len(set(valid_bigrams)))))
+for (x,y,z) in set(valid_trigrams):
+    lptri[(x,y,z)] = log((valid_trigrams.count((x,y,z))+1)/(float((valid_bigrams.count((x,y)))+len(set(valid_bigrams)))))
+
+
+
+
+
