@@ -1,26 +1,20 @@
 # -*- coding: utf-8 -*-
-# (i) Implement (in any programming language) a bigram and a trigram language model (for
-# word sequences), using Laplace smoothing (or better). (ii) Train your models on a training
-# subset of a corpus (e.g., from the English or Greek part of Europarl), after replacing all the
-# rare words of the training subset (e.g., words that do not occur at least 10 times in the training
-# subset) by a special token *rare*. Do not store (during training) counts for the *rare* token
-# and n-grams that contain the *rare* token. (iii) Check the log-probabilities that your trained
-# models return when given (correct) sentences from the test subset vs. (incorrect) sentences of
-# the same length (in words) consisting of randomly selected vocabulary words. Rely on
-# smoothing to cope with unknown words in the test subset. (iv) Demonstrate how your models
+# (iii) Check the log-probabilities that your trained models return when given (correct)
+# sentences from the test subset vs. (incorrect) sentences of the same length (in words)
+# consisting of randomly selected vocabulary words. Rely on
+# smoothing to cope with unknown words in the test subset.
+# (iv) Demonstrate how your models
 # could predict the next (vocabulary) word, as in a predictive keyboard (slide 31, center). (v)
 # Estimate the language cross-entropy and perplexity of your models on the test subset of the
 # corpus. (vi) Optionally combine your two models using linear interpolation (slide 13) and
 # check if the combined model performs better. You are allowed to use NLTK
 # (http://www.nltk.org/) or other tools for sentence splitting, tokenization, and counting ngrams,
 # but otherwise you should write your own code.
-from matplotlib.rcsetup import validate_nseq_float
+from math import log
 from nltk.tokenize import sent_tokenize
 from nltk.tokenize import word_tokenize
 from nltk import ngrams
-from nltk.probability import FreqDist
 import codecs
-#n will be added by the user
 def find_rare(diction):
     for x in diction:
         if diction[x]<10:
@@ -29,7 +23,7 @@ def find_rare(diction):
 
 f = codecs.open("europarl.txt","r","utf-8")
 europarlg = f.read() #it reads bytes so we wont have a problem with any other language
-sentences= [sent for sent in sent_tokenize(europarlg[0:90005])]
+sentences= [sent for sent in sent_tokenize(europarlg[0:100000])]
 words=[word_tokenize(w) for w in sentences]
 words = sum(words,[])  
 counter ={}
@@ -60,7 +54,6 @@ for x,y in bigrams:
         else:
             valid_bigrams.append((x,y))
 
-
 trigrams = ngrams(["#start1","#start2"]+words,3)
 for x,y,z in trigrams:
     if counter[x]!="*rare*" and counter[y]!="*rare*" and counter[z]!="*rare*":
@@ -76,13 +69,12 @@ print "the distinct words are {0}".format(len(set(valid_unigrams))) , "and the v
 
 print "valid trigrams",len(valid_trigrams),"valid bigrams",len(valid_bigrams),"and words {0}".format(len(words))
 
-#laplace smoothing of a word (c(unigram,bigram,etc)+1)/C(unigram,bigram)+|distinct unigrams or bigrams|
 lpuni = {}
 for i in set(valid_unigrams):
-    lpuni[i] = (valid_unigrams.count(i)+1)/float(len(words)+len(set(valid_unigrams)))
+    lpuni[i] = log((valid_unigrams.count(i)+1)/(float(len(words)+len(set(valid_unigrams)))))
 lpbi = {}
 for i in set(valid_bigrams):
-    lpbi[i] = (valid_bigrams.count(i)+1)/float(len(words)+len(set(valid_unigrams)))
+    lpbi[i] = log((valid_bigrams.count(i)+1)/(float(len(words)+len(set(valid_unigrams)))))
 lptri = {}
 for i in set(valid_trigrams):
-    lptri[i] = (valid_trigrams.count(i)+1)/float(len(valid_bigrams)+len(set(valid_bigrams)))
+    lptri[i] = log((valid_trigrams.count(i)+1)/(float(len(valid_bigrams)+len(set(valid_bigrams)))))
