@@ -53,7 +53,6 @@ words = sum(words,[])
 counter={}
 counter= count_occur(words, counter)
 counter= find_rare(counter)
-
 counter["#start1"]=1
 counter["#start2"]=1
 valid_unigrams = []
@@ -61,12 +60,12 @@ valid_bigrams = []
 valid_trigrams = []
 
 for i in words:
-   if counter[i]!="*rare*":
-      valid_unigrams.append(i)
+   if counter[i.lower()]!="*rare*":
+       valid_unigrams.append(i)
 
 bigrams = ngrams(["#start1"]+words,2)
 for x,y in bigrams:
-    if counter[x]!="*rare*" and counter[y]!="*rare*":
+    if counter[x.lower()]!="*rare*" and counter[y.lower()]!="*rare*":
         if valid_bigrams == []:
             if x!="#start1":
                 valid_bigrams.append(("#start1",x))
@@ -76,7 +75,7 @@ for x,y in bigrams:
 
 trigrams = ngrams(["#start1","#start2"]+words,3)
 for x,y,z in trigrams:
-    if counter[x]!="*rare*" and counter[y]!="*rare*" and counter[z]!="*rare*":
+    if counter[x.lower()]!="*rare*" and counter[y.lower()]!="*rare*" and counter[z.lower()]!="*rare*":
         if valid_trigrams == []:
             if x!="start1":
                 valid_trigrams.append(("#start1","#start2",x))
