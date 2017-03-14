@@ -114,4 +114,20 @@ for x,y,z in ttrigrams:
             test_trigrams.append((x,y,z))
         else:
             test_trigrams.append((x,y,z))
-print test_trigrams
+
+lp_uni1 = lpunigrams(valid_unigrams,words)
+lp_bi1 = lpbigrams(valid_unigrams,valid_bigrams,words)
+lp_tri1 = lptrigrams(valid_trigrams,valid_bigrams)
+
+#we take tokens from the original book
+to_tokens = word_tokenize(sentences[11])
+#we have to make bigrams,trigrams etc
+to_bigrams = ngrams(to_tokens,2)
+#to_trigrams = ngrams(["#start1","#start2"]+to_tokens,3)
+sumit = 0
+for i in to_bigrams:
+    if i in lp_bi1.keys():
+        sumit += lp_bi1[i]
+    else:
+        sumit += log(1/float(len(set(valid_bigrams))))
+print sumit
