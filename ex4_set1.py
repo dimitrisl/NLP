@@ -63,24 +63,22 @@ for i in words:
    if counter[i.lower()]!="*rare*":
        valid_unigrams.append(i)
 
-bigrams = ngrams(["#start1"]+words,2)
+bigrams = ngrams(words,2)
 for x,y in bigrams:
     if counter[x.lower()]!="*rare*" and counter[y.lower()]!="*rare*":
         if valid_bigrams == []:
-            if x!="#start1":
-                valid_bigrams.append(("#start1",x))
-                valid_bigrams.append((x,y))
+            valid_bigrams.append(("#start1",x))
+            valid_bigrams.append((x,y))
         else:
             valid_bigrams.append((x,y))
 
-trigrams = ngrams(["#start1","#start2"]+words,3)
+trigrams = ngrams(words,3)
 for x,y,z in trigrams:
     if counter[x.lower()]!="*rare*" and counter[y.lower()]!="*rare*" and counter[z.lower()]!="*rare*":
         if valid_trigrams == []:
-            if x!="start1":
-                valid_trigrams.append(("#start1","#start2",x))
-                valid_trigrams.append(("#start2",x,y))
-                valid_trigrams.append((x,y,z))
+            valid_trigrams.append(("#start1","#start2",x))
+            valid_trigrams.append(("#start2",x,y))
+            valid_trigrams.append((x,y,z))
         else:
             valid_trigrams.append((x,y,z))
 
