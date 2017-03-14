@@ -45,8 +45,8 @@ def count_occur(words, counter): #find the occurences of each token
             counter[token]+=1
     return counter
 
-f = codecs.open("europarl.txt","r","utf-8")
-europarl = f.read() #it reads bytes so we wont have a problem with any other language
+b = codecs.open("europarl.txt","r","utf-8", errors='ignore')
+europarl = b.read() #it reads bytes so we wont have a problem with any other language
 sentences= [sent for sent in sent_tokenize(europarl[0:100000])]
 words=[word_tokenize(w) for w in sentences]
 words = sum(words,[])  
@@ -84,15 +84,8 @@ for x,y,z in trigrams:
         else:
             valid_trigrams.append((x,y,z))
 
-#print "the distinct words are {0}".format(len(set(valid_unigrams))) , "and the valid unigrams",len(valid_unigrams)
 
-#print "valid trigrams",len(valid_trigrams),"valid bigrams",len(valid_bigrams),"and words {0}".format(len(words))
-
-#test 
-
-b = codecs.open("europarl.txt","r","utf-8")
-test_europarl = b.read() #it reads bytes so we wont have a problem with any other language
-test_sentences= [sent for sent in sent_tokenize(test_europarl[100010:110015])]
+test_sentences= [sent for sent in sent_tokenize(europarl[100010:110015])]
 test_words=[word_tokenize(w) for w in test_sentences]
 test_words = sum(test_words,[])  
 test_counter={}
@@ -107,22 +100,20 @@ test_counter["#start2"]=1
 for i in test_words:
     test_unigrams.append(i)
 
-tbigrams = ngrams(["#start1"]+test_words,2)
+tbigrams = ngrams(test_words,2)
 for x,y in tbigrams:
         if test_bigrams == []:
-            if x!="#start1":
-                test_bigrams.append(("#start1",x))
-                test_bigrams.append((x,y))
+            test_bigrams.append(("#start1",x))
+            test_bigrams.append((x,y))
         else:
             test_bigrams.append((x,y))
 
-ttrigrams = ngrams(["#start1","#start2"]+test_words,3)
+ttrigrams = ngrams(test_words,3)
 for x,y,z in ttrigrams:
         if test_trigrams == []:
-            if x!="start1":
-                test_trigrams.append(("#start1","#start2",x))
-                test_trigrams.append(("#start2",x,y))
-                test_trigrams.append((x,y,z))
+            test_trigrams.append(("#start1","#start2",x))
+            test_trigrams.append(("#start2",x,y))
+            test_trigrams.append((x,y,z))
         else:
             test_trigrams.append((x,y,z))
 print test_trigrams
