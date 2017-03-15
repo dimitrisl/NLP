@@ -1,7 +1,5 @@
 # -*- coding: utf-8 -*-
-# (iv) Demonstrate how your models
-# could predict the next (vocabulary) word, as in a predictive keyboard (slide 31, center). (v)
-# Estimate the language cross-entropy and perplexity of your models on the test subset of the
+# (v) Estimate the language cross-entropy and perplexity of your models on the test subset of the
 # corpus. (vi) Optionally combine your two models using linear interpolation (slide 13) and
 # check if the combined model performs better. You are allowed to use NLTK
 # (http://www.nltk.org/) or other tools for sentence splitting, tokenization, and counting ngrams,
@@ -139,3 +137,16 @@ for i in correct_bigrams_p:
 for i in correct_trigrams_p:
     print "Correct: ",correct_trigrams_p[i],"   False: ",false_trigrams_p[i]
 
+given_word = random.choice(words)
+#given_word = 'ask'
+probable = []
+for x,y in valid_bigrams:
+    if x == given_word:
+        probable.append((lp_bi1[(given_word,y)],y))
+print "the word  is : ",max(probable)[-1]
+
+probable = []
+for x,y,z in valid_trigrams:
+    if x == given_word:
+        probable.append((lp_tri1[(given_word,y,z)],y,z))
+print "the word  is : ",max(probable)
