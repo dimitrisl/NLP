@@ -1,8 +1,4 @@
 # -*- coding: utf-8 -*-
-# (iii) Check the log-probabilities that your trained models return when given (correct)
-# sentences from the test subset vs. (incorrect) sentences of the same length (in words)
-# consisting of randomly selected vocabulary words. Rely on
-# smoothing to cope with unknown words in the test subset.
 # (iv) Demonstrate how your models
 # could predict the next (vocabulary) word, as in a predictive keyboard (slide 31, center). (v)
 # Estimate the language cross-entropy and perplexity of your models on the test subset of the
@@ -15,6 +11,27 @@ from nltk.tokenize import sent_tokenize
 from nltk.tokenize import word_tokenize
 from nltk import ngrams
 import codecs
+import random
+
+def random_sentences(length,words):
+    w_sentence = []
+    for j in range(i):
+        w_sentence.append(random.choice(words))
+    w_sentence = " ".join(w_sentence)
+    return w_sentence
+
+def prob_creator(sentence,n,laplace,vocabulary):
+    new_probability = 0
+    to_tokens = word_tokenize(sentence)
+    number_of_tokens = len(to_tokens)
+    to_grams = ngrams(to_tokens, n)
+    for i in to_grams:
+        if i in laplace.keys():
+            new_probability += laplace[i]
+        else:
+            new_probability += log(1/float(vocabulary))
+    return (number_of_tokens,new_probability)
+
 def find_rare(diction):#find and delete rare tokens from dictionary
     for x in diction:
         if diction[x]<10:
@@ -71,7 +88,6 @@ for x,y in bigrams:
             valid_bigrams.append((x,y))
         else:
             valid_bigrams.append((x,y))
-
 trigrams = ngrams(words,3)
 for x,y,z in trigrams:
     if counter[x.lower()]!="*rare*" and counter[y.lower()]!="*rare*" and counter[z.lower()]!="*rare*":
@@ -82,52 +98,44 @@ for x,y,z in trigrams:
         else:
             valid_trigrams.append((x,y,z))
 
-
 test_sentences= [sent for sent in sent_tokenize(europarl[100010:110015])]
-test_words=[word_tokenize(w) for w in test_sentences]
-test_words = sum(test_words,[])  
-test_counter={}
-test_counter= count_occur(test_words, test_counter)
-
-test_unigrams = []
-test_bigrams = []
-test_trigrams = []
-test_counter["#start1"]=1
-test_counter["#start2"]=1
-
-for i in test_words:
-    test_unigrams.append(i)
-
-tbigrams = ngrams(test_words,2)
-for x,y in tbigrams:
-        if test_bigrams == []:
-            test_bigrams.append(("#start1",x))
-            test_bigrams.append((x,y))
-        else:
-            test_bigrams.append((x,y))
-
-ttrigrams = ngrams(test_words,3)
-for x,y,z in ttrigrams:
-        if test_trigrams == []:
-            test_trigrams.append(("#start1","#start2",x))
-            test_trigrams.append(("#start2",x,y))
-            test_trigrams.append((x,y,z))
-        else:
-            test_trigrams.append((x,y,z))
 
 lp_uni1 = lpunigrams(valid_unigrams,words)
 lp_bi1 = lpbigrams(valid_unigrams,valid_bigrams,words)
 lp_tri1 = lptrigrams(valid_trigrams,valid_bigrams)
 
-#we take tokens from the original book
-to_tokens = word_tokenize(sentences[11])
-#we have to make bigrams,trigrams etc
-to_bigrams = ngrams(to_tokens,2)
-#to_trigrams = ngrams(["#start1","#start2"]+to_tokens,3)
-sumit = 0
-for i in to_bigrams:
-    if i in lp_bi1.keys():
-        sumit += lp_bi1[i]
+correct_bigrams_p = {}
+for i in test_sentences:
+    x,y = prob_creator(i,2,lp_bi1,len(set(words)))
+    if x not in correct_bigrams_p.keys():
+        correct_bigrams_p[x] = [y]
     else:
-        sumit += log(1/float(len(set(valid_bigrams))))
-print sumit
+        correct_bigrams_p[x].append(y)
+
+correct_trigrams_p = {}
+for i in test_sentences:
+    x,y = prob_creator(i,3,lp_tri1,len(set(words)))
+    if x not in correct_trigrams_p.keys():
+        correct_trigrams_p[x] = [y]
+    else:
+        correct_trigrams_p[x].append(y)
+
+false_bigrams_p = {}
+for i in correct_bigrams_p.keys():
+    false_bigrams_p[i] = [] 
+    for j in range(len(correct_bigrams_p[i])):
+        false_sen = random_sentences(i,words)
+        false_bigrams_p[i].append(prob_creator(false_sen,2,lp_bi1,len(set(words)))[1])
+
+false_trigrams_p = {}
+for i in correct_trigrams_p.keys():
+    false_trigrams_p[i] = [] 
+    for j in range(len(correct_trigrams_p[i])):
+        false_sen = random_sentences(i,words)
+        false_trigrams_p[i].append(prob_creator(false_sen,3,lp_tri1,len(set(words)))[1])
+
+for i in correct_bigrams_p:
+    print "Correct: ",correct_bigrams_p[i],"  False: ",false_bigrams_p[i]
+for i in correct_trigrams_p:
+    print "Correct: ",correct_trigrams_p[i],"   False: ",false_trigrams_p[i]
+
