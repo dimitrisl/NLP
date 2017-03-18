@@ -1,10 +1,9 @@
 # -*- coding: utf-8 -*-
-# (v) Estimate the language cross-entropy and perplexity of your models on the test subset of the
-# corpus. (vi) Optionally combine your two models using linear interpolation (slide 13) and
+# (vi) Optionally combine your two models using linear interpolation (slide 13) and
 # check if the combined model performs better. You are allowed to use NLTK
 # (http://www.nltk.org/) or other tools for sentence splitting, tokenization, and counting ngrams,
 # but otherwise you should write your own code.
-from math import log
+from math import log #this is the log of e
 from nltk.tokenize import sent_tokenize
 from nltk.tokenize import word_tokenize
 from nltk import ngrams
@@ -17,6 +16,13 @@ def random_sentences(length,words):
         w_sentence.append(random.choice(words))
     w_sentence = " ".join(w_sentence)
     return w_sentence
+
+def cross_entropy(dictionary):
+    sm = 0
+    for i in dictionary:
+        sm += dictionary[i]
+    sm = (-1)*(sm/len(dictionary.keys()))
+    return sm
 
 def prob_creator(sentence,n,laplace,vocabulary):
     new_probability = 0
@@ -143,10 +149,15 @@ probable = []
 for x,y in valid_bigrams:
     if x == given_word:
         probable.append((lp_bi1[(given_word,y)],y))
-print "the word  is : ",max(probable)[-1]
+print "the word  is : ",max(probable)
 
 probable = []
 for x,y,z in valid_trigrams:
     if x == given_word:
         probable.append((lp_tri1[(given_word,y,z)],y,z))
 print "the word  is : ",max(probable)
+
+cross1 = cross_entropy(lp_bi1)
+print "bigrams",cross1
+cross2 = cross_entropy(lp_tri1)
+print "trigrams",cross2
