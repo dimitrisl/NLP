@@ -12,7 +12,7 @@ import random
 
 def random_sentences(length,words):
     w_sentence = []
-    for j in range(i):
+    for j in range(length):
         w_sentence.append(random.choice(words))
     w_sentence = " ".join(w_sentence)
     return w_sentence
@@ -68,7 +68,7 @@ def count_occur(words, counter): #find the occurences of each token
 
 b = codecs.open("europarl.txt","r","utf-8", errors='ignore')
 europarl = b.read() #it reads bytes so we wont have a problem with any other language
-sentences= [sent for sent in sent_tokenize(europarl[0:100000])]
+sentences= [sent for sent in sent_tokenize(europarl[0:200000])]
 words=[word_tokenize(w) for w in sentences]
 words = sum(words,[])  
 counter={}
@@ -102,7 +102,7 @@ for x,y,z in trigrams:
         else:
             valid_trigrams.append((x,y,z))
 
-test_sentences= [sent for sent in sent_tokenize(europarl[100010:110015])]
+test_sentences= [sent for sent in sent_tokenize(europarl[200010:220015])]
 
 lp_uni1 = lpunigrams(valid_unigrams,words)
 lp_bi1 = lpbigrams(valid_unigrams,valid_bigrams,words)
