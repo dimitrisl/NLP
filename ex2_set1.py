@@ -16,8 +16,8 @@ def count_distance(lettertarget,lettersource,listoflists,x,y):
         cost = min(listoflists[x-1][y]+1,listoflists[x][y-1]+1,listoflists[x-1][y-1]+2)
         return cost
 
-word1 = "paizete"  # target string
-word2 = "pezoitai" # source string
+word1 = "phgainw"  # target string
+word2 = "pigeno" # source string
 listoflists = [] # "array" that contains the distances
 listoflists = [[i for i in range(len(word1)+1)]] # initialization of the first vector,vectors are lines!
 
