@@ -28,27 +28,20 @@ stopwords = nltk.corpus.stopwords.words('english')
 ham_path = os.path.join(os.getcwd(),"enron1","ham" )
 spam_path= os.path.join(os.getcwd(),"enron1","spam" )
 
-ham_lista = []
-spam_lista=[]
-for i in  os.walk(ham_path):
-    ham_lista.append(i)
-ham_lista = ham_lista[0][-1]
-for i in  os.walk(spam_path):
-    spam_lista.append(i)
-
-spam_lista = spam_lista[0][-1]
 ham_files = []
 spam_files = []
-for i in ham_lista:
-    f = codecs.open(ham_path+os.sep+i,"r","utf-8", errors='ignore')
-    ham_files.append(f.read())
 
-for s in spam_lista:
-    b = codecs.open(spam_path+os.sep+s,"r","utf-8", errors='ignore')
-    spam_files.append(b.read())
-
-
-
+for root,directories,files in  os.walk(ham_path):
+    for f in files:
+        f1 = codecs.open(ham_path+os.sep+f,"r","utf-8",errors='ignore')
+        ham_files.append(f1.read())
+        f1.close()
+        
+for root,directories,files in  os.walk(spam_path):
+    for f in files:
+        f2 = codecs.open(spam_path+os.sep+f,"r","utf-8",errors='ignore')
+        spam_files.append(f2.read())
+        f2.close()
 
 for i in ham_files:
     tokens = [word.lower() for sent in nltk.sent_tokenize(i) for word in nltk.word_tokenize(sent)]
