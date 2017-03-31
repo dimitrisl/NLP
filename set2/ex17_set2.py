@@ -23,11 +23,21 @@ import os
 import nltk
 import re
 
-def create_tokens(email_files, stopwords, f_tokens):
+def count_occur(words, counter): #find the occurences of each token
+    for token in words:
+        if token not in counter.keys():
+            counter[token]= 1
+        else:
+            counter[token]+=1
+    return counter
+
+def create_voc(email_files, stopwords, f_tokens):
+    counter={}
     for i in email_files:
          tokens = [word.lower() for sent in nltk.sent_tokenize(i) for word in nltk.word_tokenize(sent)]
-    for token in tokens:
-        if token not in stopwords:
+    counter= count_occur(tokens, counter)
+    for token in counter:
+        if token not in stopwords and counter[token]>=2 and token not in [',','.','/','-',':','\'']:
             f_tokens.append(token)
     return f_tokens
 
@@ -51,10 +61,10 @@ for root,directories,files in  os.walk(spam_path):
         spam_files.append(f2.read())
         f2.close()
 
-
 filtered_tokens = []
-filtered_tokens= create_tokens(ham_files, stopwords, filtered_tokens)
-filtered_tokens= create_tokens(spam_files, stopwords, filtered_tokens)
+filtered_tokens= create_voc(ham_files, stopwords, filtered_tokens)
+filtered_tokens.extend(create_voc(spam_files, stopwords, filtered_tokens))
+
 
 
 print filtered_tokens[15]
