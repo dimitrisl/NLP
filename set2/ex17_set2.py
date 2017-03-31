@@ -23,6 +23,14 @@ import os
 import nltk
 import re
 
+def create_tokens(email_files, stopwords, f_tokens):
+    for i in email_files:
+         tokens = [word.lower() for sent in nltk.sent_tokenize(i) for word in nltk.word_tokenize(sent)]
+    for token in tokens:
+        if token not in stopwords:
+            f_tokens.append(token)
+    return f_tokens
+
 stopwords = nltk.corpus.stopwords.words('english')
 
 ham_path = os.path.join(os.getcwd(),"enron1","ham" )
@@ -43,12 +51,10 @@ for root,directories,files in  os.walk(spam_path):
         spam_files.append(f2.read())
         f2.close()
 
-for i in ham_files:
-    tokens = [word.lower() for sent in nltk.sent_tokenize(i) for word in nltk.word_tokenize(sent)]
-    filtered_tokens = []
-    # filter out any tokens not containing letters (e.g., numeric tokens, raw punctuation)
-for token in tokens:
-    if token not in stopwords:
-        filtered_tokens.append(token)
+
+filtered_tokens = []
+filtered_tokens= create_tokens(ham_files, stopwords, filtered_tokens)
+filtered_tokens= create_tokens(spam_files, stopwords, filtered_tokens)
+
 
 print filtered_tokens[15]
