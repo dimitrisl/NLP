@@ -21,28 +21,47 @@
 import codecs
 import os
 import nltk
-import re
 
-def count_occur(words, counter): #find the occurences of each token
+def tokenizer(text):
+    tokens = [word.lower() for sent in nltk.sent_tokenize(text) for word in nltk.word_tokenize(sent)]
+    return tokens
+
+def count_occur(words): #find the occurences of each token
+    counter={}
+    for i in set(words):
+        counter[i] = 0
     for token in words:
-        if token not in counter.keys():
-            counter[token]= 1
-        else:
-            counter[token]+=1
+        counter[token]+=1
     return counter
 
-def create_voc(email_files, stopwords, f_tokens):
-    counter={}
+
+def create_voc(email_files,language):
+    stopwords = nltk.corpus.stopwords.words(language)
+    f_tokens = []
+    symbols = ["{",'}',"@","(",")","[","]",".",":",";","+","-","*","/","&","|","<",">","=","~",'"',","]
+    tokens = []
     for i in email_files:
-         tokens = [word.lower() for sent in nltk.sent_tokenize(i) for word in nltk.word_tokenize(sent)]
-    counter= count_occur(tokens, counter)
-    for token in counter:
-        if token not in stopwords and counter[token]>=2 and token not in [',','.','/','-',':','\'']:
+        mid = tokenizer(i)
+        mid = [l for l in mid if not str(l).isdigit()]
+        tokens.extend([k for k in mid if k not in symbols and k not in stopwords])
+    counter = count_occur(tokens)
+    for token in counter.keys():
+        if counter[token]>=2: # we let ! because it is very common in spam files!
             f_tokens.append(token)
     return f_tokens
 
-stopwords = nltk.corpus.stopwords.words('english')
+def sieve(text,true_vocabulary):
+    tokens = tokenizer(text)
+    sent_back = []
+    for i in tokens:
+        if i in true_vocabulary:
+            sent_back.append(i)
+    return sent_back
 
+def freq_vector(email,vocabulary):
+    pass    
+
+stopwords = nltk.corpus.stopwords.words('english')
 ham_path = os.path.join(os.getcwd(),"enron1","ham" )
 spam_path= os.path.join(os.getcwd(),"enron1","spam" )
 
@@ -61,10 +80,8 @@ for root,directories,files in  os.walk(spam_path):
         spam_files.append(f2.read())
         f2.close()
 
-filtered_tokens = []
-filtered_tokens= create_voc(ham_files, stopwords, filtered_tokens)
-filtered_tokens.extend(create_voc(spam_files, stopwords, filtered_tokens))
-
-
-
-print filtered_tokens[15]
+filtered_tokens= create_voc(ham_files+spam_files,'english')
+filtered_tokens = set(filtered_tokens)
+#doing the preprocessesing for the feature selection
+all_labeled = [ (sieve(i,filtered_tokens),'ham') for i in ham_files]
+all_labeled.extend([ (sieve(i,filtered_tokens),'spam') for i in spam_files])
