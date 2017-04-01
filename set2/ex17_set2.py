@@ -46,9 +46,9 @@ def create_voc(email_files,language):
         tokens.extend([k for k in mid if k not in symbols and k not in stopwords])
     counter = count_occur(tokens)
     for token in counter.keys():
-        if counter[token]>=2: # we let ! because it is very common in spam files!
+        if counter[token]>=20: # we let ! because it is very common in spam files!
             f_tokens.append(token)
-    return f_tokens
+    return f_tokens,counter
 
 def sieve(text,true_vocabulary):
     tokens = tokenizer(text)
@@ -80,7 +80,7 @@ for root,directories,files in  os.walk(spam_path):
         spam_files.append(f2.read())
         f2.close()
 
-filtered_tokens= create_voc(ham_files+spam_files,'english')
+filtered_tokens,occurences= create_voc(ham_files+spam_files,'english')
 filtered_tokens = set(filtered_tokens)
 #doing the preprocessesing for the feature selection
 all_labeled = [ (sieve(i,filtered_tokens),'ham') for i in ham_files]
