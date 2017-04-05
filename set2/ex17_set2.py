@@ -42,7 +42,7 @@ def count_occur(words): #find the occurences of each token
 def create_voc(email_files):
     stopwords = nltk.corpus.stopwords.words("english")
     f_tokens = []
-    symbols = ["//","_","``","#","{",'}',"@","(",")","[","]",".",":",";","+","-","*","/","&","|","<",">","=","~",'"',",","'","?","etc","ect"]
+    symbols = ["%","''","//","_","``","#","{",'}',"@","(",")","[","]",".",":",";","+","-","*","/","&","|","<",">","=","~",'""',",","'","?","etc","ect"]
     extras = ["www","mail","http","forward","Re","to","cc","subject","sent","hotmail","gmail","yahoo","msn","outlook","enron","com","gov","net"]
     months = ["january","february","march","april","may","june","july","august","september","october","november","december"]
     extras.extend(months+[i[:3] for i in months])
@@ -55,30 +55,25 @@ def create_voc(email_files):
         mid = tokenizer(i)
         tokens.extend([k for k in mid if not str(k).isdigit() and k not in symbols and k not in stopwords])
     counter = count_occur(tokens)
-    counter = sorted(zip(counter.values(),counter.keys()),reverse=True)[:2000]
+    counter = sorted(zip(counter.values(),counter.keys()),reverse=True)[:1000]
     for x,y in counter:
         f_tokens.append(y)
     return f_tokens,counter
 
-def tf(word,text): # i pass the stemmer object
+def tf(text,vocabulary): # i pass the stemmer object
     tokens=tokenizer(text)
-    return float(tokens.count(word))/len(tokens)
+    result = {}
+    for word in tokens:
+        if word in vocabulary:
+            result[word] = float(tokens.count(word))/len(tokens)
+    return result
 
 def idf(word,corpus):
-    docfreq=0
+    docfreq = 0
     for i in corpus:
         if word in tokenizer(i):
             docfreq+=1
     return log(float(len(corpus)/docfreq))
-
-def freq_vector(emails,vocabulary):
-    dt = {}
-    counter = 0 
-    for i,j in emails:
-        for l in vocabulary:
-            dt[(l,counter,j)] = tf(l,i)
-        counter+=1
-    return dt
 
 stopwords = nltk.corpus.stopwords.words('english')
 ham_path = os.path.join(os.getcwd(),"enron1","ham" )
@@ -100,7 +95,16 @@ for root,directories,files in  os.walk(spam_path):
         f2.close()
 
 vocabulary,occurences= create_voc(ham_files+spam_files)
-print vocabulary[:10]
+
 all_mail = [(i,"ham") for i in ham_files]
 all_mail.extend([(j,"spam") for j in spam_files])
-d = freq_vector(all_mail,vocabulary)
+tfs = {}
+idfs = {}
+for i in vocabulary:
+    idfs[i] = idf(i,[ text for text,tag in all_mail])
+
+counter = 0
+for i,j in all_mail:
+    tfs[(counter,j)] = tf(i,vocabulary)
+    words_in_i = tfs[(counter,j)].keys()
+    counter+=1
