@@ -21,6 +21,7 @@
 import codecs
 import os
 import nltk
+from nltk.stem.snowball import SnowballStemmer
 
 def tokenizer(text):
     tokens = [word.lower() for sent in nltk.sent_tokenize(text) for word in nltk.word_tokenize(sent)]
@@ -39,6 +40,12 @@ def create_voc(email_files,language):
     stopwords = nltk.corpus.stopwords.words(language)
     f_tokens = []
     symbols = ["{",'}',"@","(",")","[","]",".",":",";","+","-","*","/","&","|","<",">","=","~",'"',","]
+    extras = ["Re","to","cc","Subject","sent","hotmail","gmail","yahoo","msn","outlook"]
+    months = ["january","february","march","april","may","june","july","august","september","october","november","december"]
+    extras.extend(months+[i[:3] for i in months])
+    days = ["monday","tuesday","wednesday","thursday","friday","saturday","sunday"]
+    extras.extend(days + [i[:3] for i in days]) #days + days in 3 letters
+    stopwords.extend(extras)
     tokens = []
     for i in email_files:
         mid = tokenizer(i)
@@ -50,16 +57,18 @@ def create_voc(email_files,language):
             f_tokens.append(token)
     return f_tokens,counter
 
-def sieve(text,true_vocabulary):
+def sieve(text,true_vocabulary,stemmer): # i pass the stemmer object
     tokens = tokenizer(text)
     sent_back = []
     for i in tokens:
-        if i in true_vocabulary:
+        if stemmer.stem(i) in true_vocabulary:
             sent_back.append(i)
     return sent_back
 
 def freq_vector(email,vocabulary):
-    pass    
+    #tf-idf vector
+    #bow vector
+    pass
 
 stopwords = nltk.corpus.stopwords.words('english')
 ham_path = os.path.join(os.getcwd(),"enron1","ham" )
@@ -82,6 +91,8 @@ for root,directories,files in  os.walk(spam_path):
 
 filtered_tokens,occurences= create_voc(ham_files+spam_files,'english')
 filtered_tokens = set(filtered_tokens)
+stemmer = SnowballStemmer("english")
+stemmed = set([stemmer.stem(t) for t in filtered_tokens]) #this is the stemmed voc
 #doing the preprocessesing for the feature selection
-all_labeled = [ (sieve(i,filtered_tokens),'ham') for i in ham_files]
-all_labeled.extend([ (sieve(i,filtered_tokens),'spam') for i in spam_files])
+all_labeled = [ (sieve(i,stemmed,stemmer),'ham') for i in ham_files]
+all_labeled.extend([ (sieve(k,stemmed,stemmer),'spam') for k in spam_files])
