@@ -23,6 +23,7 @@ import os
 import nltk
 from nltk.stem.snowball import SnowballStemmer
 from math import log
+import string
 
 def tokenizer(text):
     stemmer = SnowballStemmer("english")
@@ -38,24 +39,25 @@ def count_occur(words): #find the occurences of each token
     return counter
 
 
-def create_voc(email_files,language):
-    stopwords = nltk.corpus.stopwords.words(language)
+def create_voc(email_files):
+    stopwords = nltk.corpus.stopwords.words("english")
     f_tokens = []
-    symbols = ["{",'}',"@","(",")","[","]",".",":",";","+","-","*","/","&","|","<",">","=","~",'"',","]
-    extras = ["Re","to","cc","subject","sent","hotmail","gmail","yahoo","msn","outlook"]
+    symbols = ["_","``","#","{",'}',"@","(",")","[","]",".",":",";","+","-","*","/","&","|","<",">","=","~",'"',",","'","?","etc","ect"]
+    extras = ["Re","to","cc","subject","sent","hotmail","gmail","yahoo","msn","outlook","enron","com","gov","net"]
     months = ["january","february","march","april","may","june","july","august","september","october","november","december"]
     extras.extend(months+[i[:3] for i in months])
     days = ["monday","tuesday","wednesday","thursday","friday","saturday","sunday"]
     extras.extend(days + [i[:3] for i in days]) #days + days in 3 letters
+    extras.extend(list(string.ascii_lowercase))
     stopwords.extend(extras)
     tokens = []
     for i in email_files:
         mid = tokenizer(i)
         tokens.extend([k for k in mid if not str(k).isdigit() and k not in symbols and k not in stopwords])
     counter = count_occur(tokens)
-    for token in counter.keys():
-        if counter[token]>=3: # we let ! because it is very common in spam files!
-            f_tokens.append(token)
+    counter = sorted(zip(counter.values(),counter.keys()),reverse=True)[:2000]
+    for x,y in counter:
+        f_tokens.append(y)
     return f_tokens,counter
 
 def tf(word,text): # i pass the stemmer object
@@ -68,8 +70,6 @@ def idf(word,corpus):
         if word in tokenizer(i):
             docfreq+=1
     return log(float(len(corpus)/docfreq))
-
-            
 
 def freq_vector(email,vocabulary):
     #tf-idf vector
@@ -95,8 +95,5 @@ for root,directories,files in  os.walk(spam_path):
         spam_files.append(f2.read())
         f2.close()
 
-filtered_tokens,occurences= create_voc(ham_files+spam_files,'english')
-filtered_tokens = set(filtered_tokens)
-
- #this is the stemmed voc
-#doing the preprocessesing for the feature selection
+vocabulary,occurences= create_voc(ham_files+spam_files)
+print vocabulary[:10]
