@@ -22,9 +22,11 @@ import codecs
 import os
 import nltk
 from nltk.stem.snowball import SnowballStemmer
+from math import log
 
 def tokenizer(text):
-    tokens = [word.lower() for sent in nltk.sent_tokenize(text) for word in nltk.word_tokenize(sent)]
+    stemmer = SnowballStemmer("english")
+    tokens = [stemmer.stem(word.lower()) for sent in nltk.sent_tokenize(text) for word in nltk.word_tokenize(sent)]
     return tokens
 
 def count_occur(words): #find the occurences of each token
@@ -40,7 +42,7 @@ def create_voc(email_files,language):
     stopwords = nltk.corpus.stopwords.words(language)
     f_tokens = []
     symbols = ["{",'}',"@","(",")","[","]",".",":",";","+","-","*","/","&","|","<",">","=","~",'"',","]
-    extras = ["Re","to","cc","Subject","sent","hotmail","gmail","yahoo","msn","outlook"]
+    extras = ["Re","to","cc","subject","sent","hotmail","gmail","yahoo","msn","outlook"]
     months = ["january","february","march","april","may","june","july","august","september","october","november","december"]
     extras.extend(months+[i[:3] for i in months])
     days = ["monday","tuesday","wednesday","thursday","friday","saturday","sunday"]
@@ -49,21 +51,25 @@ def create_voc(email_files,language):
     tokens = []
     for i in email_files:
         mid = tokenizer(i)
-        mid = [l for l in mid if not str(l).isdigit()]
-        tokens.extend([k for k in mid if k not in symbols and k not in stopwords])
+        tokens.extend([k for k in mid if not str(k).isdigit() and k not in symbols and k not in stopwords])
     counter = count_occur(tokens)
     for token in counter.keys():
-        if counter[token]>=20: # we let ! because it is very common in spam files!
+        if counter[token]>=3: # we let ! because it is very common in spam files!
             f_tokens.append(token)
     return f_tokens,counter
 
-def sieve(text,true_vocabulary,stemmer): # i pass the stemmer object
-    tokens = tokenizer(text)
-    sent_back = []
-    for i in tokens:
-        if stemmer.stem(i) in true_vocabulary:
-            sent_back.append(i)
-    return sent_back
+def tf(word,text): # i pass the stemmer object
+    tokens=tokenizer(text)
+    return float(tokens.count(word))/len(tokens)
+
+def idf(word,corpus):
+    docfreq=0
+    for i in corpus:
+        if word in tokenizer(i):
+            docfreq+=1
+    return log(float(len(corpus)/docfreq))
+
+            
 
 def freq_vector(email,vocabulary):
     #tf-idf vector
@@ -91,8 +97,6 @@ for root,directories,files in  os.walk(spam_path):
 
 filtered_tokens,occurences= create_voc(ham_files+spam_files,'english')
 filtered_tokens = set(filtered_tokens)
-stemmer = SnowballStemmer("english")
-stemmed = set([stemmer.stem(t) for t in filtered_tokens]) #this is the stemmed voc
+
+ #this is the stemmed voc
 #doing the preprocessesing for the feature selection
-all_labeled = [ (sieve(i,stemmed,stemmer),'ham') for i in ham_files]
-all_labeled.extend([ (sieve(k,stemmed,stemmer),'spam') for k in spam_files])
