@@ -42,8 +42,8 @@ def count_occur(words): #find the occurences of each token
 def create_voc(email_files):
     stopwords = nltk.corpus.stopwords.words("english")
     f_tokens = []
-    symbols = ["_","``","#","{",'}',"@","(",")","[","]",".",":",";","+","-","*","/","&","|","<",">","=","~",'"',",","'","?","etc","ect"]
-    extras = ["Re","to","cc","subject","sent","hotmail","gmail","yahoo","msn","outlook","enron","com","gov","net"]
+    symbols = ["//","_","``","#","{",'}',"@","(",")","[","]",".",":",";","+","-","*","/","&","|","<",">","=","~",'"',",","'","?","etc","ect"]
+    extras = ["www","mail","http","forward","Re","to","cc","subject","sent","hotmail","gmail","yahoo","msn","outlook","enron","com","gov","net"]
     months = ["january","february","march","april","may","june","july","august","september","october","november","december"]
     extras.extend(months+[i[:3] for i in months])
     days = ["monday","tuesday","wednesday","thursday","friday","saturday","sunday"]
@@ -71,10 +71,14 @@ def idf(word,corpus):
             docfreq+=1
     return log(float(len(corpus)/docfreq))
 
-def freq_vector(email,vocabulary):
-    #tf-idf vector
-    #bow vector
-    pass
+def freq_vector(emails,vocabulary):
+    dt = {}
+    counter = 0 
+    for i,j in emails:
+        for l in vocabulary:
+            dt[(l,counter,j)] = tf(l,i)
+        counter+=1
+    return dt
 
 stopwords = nltk.corpus.stopwords.words('english')
 ham_path = os.path.join(os.getcwd(),"enron1","ham" )
@@ -97,3 +101,6 @@ for root,directories,files in  os.walk(spam_path):
 
 vocabulary,occurences= create_voc(ham_files+spam_files)
 print vocabulary[:10]
+all_mail = [(i,"ham") for i in ham_files]
+all_mail.extend([(j,"spam") for j in spam_files])
+d = freq_vector(all_mail,vocabulary)
