@@ -51,14 +51,18 @@ def create_voc(email_files):
     extras.extend(list(string.ascii_lowercase))
     stopwords.extend(extras)
     tokens = []
-    for i in email_files:
+    exists = {}
+    for counter,i in enumerate(email_files):
         mid = tokenizer(i)
+        for leksi in set(mid):
+            exists[(counter,leksi)] = 1
         tokens.extend([k for k in mid if not str(k).isdigit() and k not in symbols and k not in stopwords])
+        
     counter = count_occur(tokens)
-    counter = sorted(zip(counter.values(),counter.keys()),reverse=True)[:1000]
+    counter = sorted(zip(counter.values(),counter.keys()),reverse=True)[:2000]
     for x,y in counter:
         f_tokens.append(y)
-    return f_tokens,counter
+    return f_tokens,counter,exists
 
 def tf(text,vocabulary): # i pass the stemmer object
     tokens=tokenizer(text)
@@ -68,12 +72,16 @@ def tf(text,vocabulary): # i pass the stemmer object
             result[word] = float(tokens.count(word))/len(tokens)
     return result
 
-def idf(word,corpus):
-    docfreq = 0
-    for i in corpus:
-        if word in tokenizer(i):
-            docfreq+=1
-    return log(float(len(corpus)/docfreq))
+def idf(vocabulary,existance,all_mail):
+    dictionary = {}
+    for word in vocabulary:
+        dictionary[word] = 0
+    for i,j in existance.keys():
+        if j in vocabulary:
+            dictionary[j]+=1
+    for key in dictionary:
+        dictionary[key] = log(float(all_mail/dictionary[key]))
+    return dictionary
 
 stopwords = nltk.corpus.stopwords.words('english')
 ham_path = os.path.join(os.getcwd(),"enron1","ham" )
@@ -93,18 +101,21 @@ for root,directories,files in  os.walk(spam_path):
         f2 = codecs.open(spam_path+os.sep+f,"r","utf-8",errors='ignore')
         spam_files.append(f2.read())
         f2.close()
+print "stop1"
 
-vocabulary,occurences= create_voc(ham_files+spam_files)
-
+vocabulary,occurences,exists= create_voc(ham_files+spam_files)
+print "stop2"
 all_mail = [(i,"ham") for i in ham_files]
 all_mail.extend([(j,"spam") for j in spam_files])
 tfs = {}
-idfs = {}
-for i in vocabulary:
-    idfs[i] = idf(i,[ text for text,tag in all_mail])
-
+print "start idf"
+idfs = idf(vocabulary,exists,len(all_mail))
+print "start tf"
 counter = 0
 for i,j in all_mail:
     tfs[(counter,j)] = tf(i,vocabulary)
     words_in_i = tfs[(counter,j)].keys()
+    print counter
     counter+=1
+print "stop4"
+
