@@ -42,8 +42,8 @@ def count_occur(words): #find the occurences of each token
 def create_voc(email_files):
     stopwords = nltk.corpus.stopwords.words("english")
     f_tokens = []
-    symbols = ["%","''","//","_","``","#","{",'}',"@","(",")","[","]",".",":",";","+","-","*","/","&","|","<",">","=","~",'""',",","'","?","etc","ect"]
-    extras = ["www","mail","http","forward","Re","to","cc","subject","sent","hotmail","gmail","yahoo","msn","outlook","enron","com","gov","net"]
+    symbols = ["%","''","//","_","``","~","#","{",'}',"@","(",")","[","]",".",":",";","+","-","*","/","\\","^","&","|","<",">","=","~",'""',",","'","?","etc","ect"]
+    extras = ["www","mail","http","forward","Re","to","cc","subject","sent","hotmail","gmail","yahoo","msn","outlook","enron","com","gov","net","attach"]
     months = ["january","february","march","april","may","june","july","august","september","october","november","december"]
     extras.extend(months+[i[:3] for i in months])
     days = ["monday","tuesday","wednesday","thursday","friday","saturday","sunday"]
@@ -67,8 +67,8 @@ def create_voc(email_files):
 def tf(text,vocabulary): # i pass the stemmer object
     tokens=tokenizer(text)
     result = {}
-    for word in vocabulary:
-        result[word] = 0
+    #for word in vocabulary:
+       # result[word] = 0
     for word in tokens:
         if word in vocabulary:
             result[word] = float(tokens.count(word))/len(tokens)
@@ -85,6 +85,15 @@ def idf(vocabulary,existance,all_mail):
         dictionary[key] = log(float(all_mail/dictionary[key]))
     return dictionary
 
+def tf_idf(tfs, idfs):
+    tf_idfs={}
+    for i,j in tfs:# i= #email j= tag
+        for word in idfs:
+            if word in tfs[(i,j)].keys():
+                tf_idfs[(i,word)]=idfs[word]*tfs[(i,j)][word]
+            else:
+                tf_idfs[(i,word)]=0
+
 stopwords = nltk.corpus.stopwords.words('english')
 ham_path = os.path.join(os.getcwd(),"enron1","ham" )
 spam_path= os.path.join(os.getcwd(),"enron1","spam" )
@@ -97,7 +106,7 @@ for root,directories,files in  os.walk(ham_path):
         f1 = codecs.open(ham_path+os.sep+f,"r","utf-8",errors='ignore')
         ham_files.append(f1.read())
         f1.close()
-        
+ham_files= ham_files[:2500] #used for training
 for root,directories,files in  os.walk(spam_path):
     for f in files:
         f2 = codecs.open(spam_path+os.sep+f,"r","utf-8",errors='ignore')
@@ -105,6 +114,7 @@ for root,directories,files in  os.walk(spam_path):
         f2.close()
 print "stop1"
 
+spam_files=spam_files[:1000] #used for training
 vocabulary,occurences,exists= create_voc(ham_files+spam_files)
 print "stop2"
 all_mail = [(i,"ham") for i in ham_files]
