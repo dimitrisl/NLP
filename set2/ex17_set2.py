@@ -67,6 +67,8 @@ def create_voc(email_files):
 def tf(text,vocabulary): # i pass the stemmer object
     tokens=tokenizer(text)
     result = {}
+    for word in vocabulary:
+        result[word] = 0
     for word in tokens:
         if word in vocabulary:
             result[word] = float(tokens.count(word))/len(tokens)
@@ -114,7 +116,6 @@ print "start tf"
 counter = 0
 for i,j in all_mail:
     tfs[(counter,j)] = tf(i,vocabulary)
-    words_in_i = tfs[(counter,j)].keys()
     print counter
     counter+=1
 print "stop4"
