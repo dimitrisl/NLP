@@ -1,3 +1,8 @@
 .idea
 europarl.txt
 set2/enron1/*
+set2/utilities/test
+set2/utilities/training
+set2/utilities/resources
+
+*.pyc

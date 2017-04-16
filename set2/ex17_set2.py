@@ -25,6 +25,7 @@ from nltk.stem.snowball import SnowballStemmer
 from math import log
 import string
 
+
 def tokenizer(text):
     stemmer = SnowballStemmer("english")
     tokens = [stemmer.stem(word.lower()) for sent in nltk.sent_tokenize(text) for word in nltk.word_tokenize(sent)]
