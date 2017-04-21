@@ -4,5 +4,7 @@ set2/enron1/*
 set2/utilities/test
 set2/utilities/training
 set2/utilities/resources
+set2new/test/*
+set2new/training/*
 
 *.pyc

@@ -21,6 +21,8 @@ def pipeline():
 
     train_x = numpy.concatenate((ham_x, spam_x), axis=0)
     train_y = numpy.concatenate((ham_y, spam_y), axis=0)
+    for i in train_x[:5]:
+        print len(i)
 
     with open(train_data_fp, 'wb') as f:
         dill.dump((train_x, train_y), f)
@@ -38,5 +40,5 @@ def load_train_data():
 
 
 if __name__ == "__main__":
-    # pipeline()
+    pipeline()
     load_train_data()

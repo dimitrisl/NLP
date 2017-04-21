@@ -1,0 +1,4 @@
+.idea
+set2new/test/*
+set2new/training/*
+*.pyc

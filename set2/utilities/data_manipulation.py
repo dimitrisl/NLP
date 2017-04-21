@@ -21,7 +21,7 @@ def open_files_in_path(file_path):
 
 
 def tokenize_and_pre_process(text, del_digits=True, del_punct=True, del_urls_emails=True, del_space=True,
-                             del_stop=True, del_symbols=True, lemma=False):
+                             del_stop=True, del_symbols=True, lemma=True):
     tokens = []
     for token in nlp(unicode(text, 'utf-8')):
         if not((token.is_digit and del_digits) or (token.is_punct and del_punct) or
@@ -52,14 +52,14 @@ def select_terms_by_distribution(ham_lexicon, spam_lexicon, threshold=0.75):
         if frequency / float(frequency + ham_lexicon[term]) >= threshold:
             selected_terms.append(term)
             idf_lexicon[term] = frequency + ham_lexicon[term]
-
     return selected_terms, idf_lexicon
 
 
+
 def main():
-    ham = build_lexicon([list(tokenize_and_pre_process(text, lemma=False))
+    ham = build_lexicon([list(tokenize_and_pre_process(text, lemma=True))
                          for text in open_files_in_path(ham_path)])
-    spam = build_lexicon(list([tokenize_and_pre_process(text, lemma=False)
+    spam = build_lexicon(list([tokenize_and_pre_process(text, lemma=True)
                                for text in open_files_in_path(spam_path)]))
     terms, idf = select_terms_by_distribution(ham, spam)
 

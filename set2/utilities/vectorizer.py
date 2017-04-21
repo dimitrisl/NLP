@@ -11,7 +11,7 @@ with open(os.path.join(os.path.dirname(__file__), 'resources', 'idf_terms.json')
 
 
 def term_frequencies(text):
-    return Counter(tokenize_and_pre_process(text, lemma=False))
+    return Counter(tokenize_and_pre_process(text, lemma=True))
 
 
 def feature_vector(text):
