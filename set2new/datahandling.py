@@ -1,12 +1,13 @@
 from collections import Counter
 import os
-import spacy
+from spacy.en import English
 import json
 from math import log
 
 ham_path = os.path.join(os.path.dirname(__file__), "training", "ham")
 spam_path = os.path.join(os.path.dirname(__file__), "training", "spam")
-nlp = spacy.load('en')
+nlp = English()
+
 
 #read files from path
 def open_files_inpath( filepath ):
@@ -19,6 +20,7 @@ def open_files_inpath( filepath ):
     print("{0} files collected from path".format(len(content)))
     return content
 
+
 #preprocess and tokenization.exclude tokens that are numbers,
     # punctuation,symbols,stopwords, email, url, space and perform lemmatization
 def prep_and_tokenizer(text, lemma=True):
@@ -29,6 +31,7 @@ def prep_and_tokenizer(text, lemma=True):
                 token.is_space or token.pos_ in {'SYM', 'NUM', 'X', 'PUNCT'}):
             tokens.append(token.lemma_ if lemma else token.text.lower())
     return tokens
+
 
 #build vocabulary with words that have over 15 appearences
 def build_voc(list_of_tokens, minimum_df = 15):
@@ -44,20 +47,21 @@ def build_voc(list_of_tokens, minimum_df = 15):
 
 #feature selection performed under the rule that a word should
     # appear more than 75% more in one category to provide information
-def feature_selection(ham_voc, spam_voc, nhamdoc, nspamdoc, threshold = 0.75):
+def feature_selection(ham_voc, spam_voc, nhamdoc, nspamdoc, threshold = 0.80):
 
     selected_terms, idf_list = [], {}
     for term, freq in ham_voc.iteritems():
         if freq/float(freq+spam_voc[term]) >= threshold:
             selected_terms.append(term)
-            idf_list[term] = log((float(nhamdoc) / (freq + spam_voc[term])),2)
+            idf_list[term] = log((float(nhamdoc+nspamdoc) / (freq + spam_voc[term])),2)
 
     for term, freq in spam_voc.iteritems():
         if freq/float(freq+ham_voc[term]) >= threshold:
             selected_terms.append(term)
-            idf_list[term] = log((float(nspamdoc)/(freq+ham_voc[term])),2)
+            idf_list[term] = log((float(nspamdoc+nhamdoc)/(freq+ham_voc[term])),2)
     print("{0} terms selected".format(len(selected_terms)))
     return selected_terms, idf_list
+
 
 def dataload():
     ham = open_files_inpath(ham_path)

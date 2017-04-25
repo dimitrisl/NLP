@@ -20,5 +20,4 @@ def feature_vector(text):
     for term in idf:
         vector.append(tf_dict[term] * (1 / idf[term]))
 
-    print len(vector)
     return vector
