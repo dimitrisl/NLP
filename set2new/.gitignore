@@ -1,4 +1,5 @@
 .idea
 set2new/test/*
 set2new/training/*
+set2new/training.zip
 *.pyc

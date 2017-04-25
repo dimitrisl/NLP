@@ -3,6 +3,7 @@ from collections import Counter
 import json
 import os
 
+
 #read from file that contains the idf for the terms of the voc after feature selection
 with open(os.path.join(os.path.dirname(__file__), 'idf_terms.json')) as f:
     idf = json.load(f)
@@ -19,4 +20,5 @@ def feature_vector(text):
     for term in idf:
         vector.append(tf_dict[term] * (1 / idf[term]))
 
+    print len(vector)
     return vector

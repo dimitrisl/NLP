@@ -2,7 +2,9 @@ from utilities.data_manipulation import main as build_idf, open_files_in_path as
 from utilities.vectorizer import feature_vector
 from tqdm import tqdm
 
+
 import dill
+
 import numpy
 import os
 
@@ -21,11 +23,11 @@ def pipeline():
 
     train_x = numpy.concatenate((ham_x, spam_x), axis=0)
     train_y = numpy.concatenate((ham_y, spam_y), axis=0)
-    for i in train_x[:5]:
-        print len(i)
 
-    with open(train_data_fp, 'wb') as f:
+
+    with open(train_data_fp, 'w') as f:
         dill.dump((train_x, train_y), f)
+
 
 
 def build_indexes():
@@ -41,4 +43,4 @@ def load_train_data():
 
 if __name__ == "__main__":
     pipeline()
-    load_train_data()
+    t=load_train_data()

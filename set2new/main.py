@@ -1,4 +1,4 @@
-from datahandling import *
+from datahandling import open_files_inpath
 import os
 import numpy
 from vectorizer import feature_vector
@@ -17,3 +17,9 @@ spam_y = numpy.array(numpy.zeros(len(spam_x)))
 
 train_x = numpy.concatenate((ham_x, spam_x), axis=0)
 train_y = numpy.concatenate((ham_y, spam_y), axis=0)
+
+
+train_data=[]
+train_data.append(train_x)
+train_data.append(train_y)
+print('Loaded training data set: {0} records'.format(len(train_data[0])))

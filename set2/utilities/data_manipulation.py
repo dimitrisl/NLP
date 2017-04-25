@@ -52,6 +52,7 @@ def select_terms_by_distribution(ham_lexicon, spam_lexicon, threshold=0.75):
         if frequency / float(frequency + ham_lexicon[term]) >= threshold:
             selected_terms.append(term)
             idf_lexicon[term] = frequency + ham_lexicon[term]
+    print('IDF Lexicon composed of {0} tokens after feature selection'.format(len(idf_lexicon.keys())))
     return selected_terms, idf_lexicon
 
 
