@@ -18,6 +18,6 @@ def feature_vector(text):
     vector = []
 
     for term in idf:
-        vector.append(tf_dict[term] * (1 / idf[term]))
+        vector.append(tf_dict[term] * idf[term])
 
     return vector

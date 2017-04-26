@@ -51,10 +51,3 @@ gausbay_model.fit(train_x,train_y)
 test_predicted_gb= gausbay_model.predict(test_x)
 
 print(metrics.classification_report(test_y,test_predicted_gb,digits=3))
-
-
-
-
-
-
-

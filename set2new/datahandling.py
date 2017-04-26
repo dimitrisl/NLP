@@ -48,30 +48,38 @@ def build_voc(list_of_tokens, minimum_df = 15):
 #feature selection performed under the rule that a word should
     # appear more than 75% more in one category to provide information
 def feature_selection(ham_voc, spam_voc, nhamdoc, nspamdoc, threshold = 0.80):
-
+    with open('setwords.json') as data_file:
+        true_idf = json.load(data_file)
     selected_terms, idf_list = [], {}
     for term, freq in ham_voc.iteritems():
         if freq/float(freq+spam_voc[term]) >= threshold:
             selected_terms.append(term)
-            idf_list[term] = log((float(nhamdoc+nspamdoc) / (freq + spam_voc[term])),2)
-
+            idf_list[term] = log((float(nhamdoc+nspamdoc) / (true_idf[term])),2)
     for term, freq in spam_voc.iteritems():
         if freq/float(freq+ham_voc[term]) >= threshold:
             selected_terms.append(term)
-            idf_list[term] = log((float(nspamdoc+nhamdoc)/(freq+ham_voc[term])),2)
+            idf_list[term] = log((float(nspamdoc+nhamdoc)/(true_idf[term])),2)
     print("{0} terms selected".format(len(selected_terms)))
     return selected_terms, idf_list
 
 
 def dataload():
     ham = open_files_inpath(ham_path)
-    ham_voc = build_voc([list(prep_and_tokenizer(text, lemma=True))
-                         for text in ham])
     spam = open_files_inpath(spam_path)
-    spam_voc = build_voc(list([prep_and_tokenizer(text, lemma=True)
-                               for text in spam]))
+    keepham = [list(prep_and_tokenizer(text, lemma=True)) for text in ham]
+    keepspam = list([prep_and_tokenizer(text, lemma=True) for text in spam])
+    lista = [str(token) for i in keepham for token in set(i)]
+    lista.extend([str(token) for i in keepspam for token in set(i)])
+    print "sanitizing the words"
+    wo = Counter(lista)
+    print "writing them in json"
+    with open(os.path.join(os.getcwd(), 'setwords.json'), 'w') as f:
+        json.dump(wo, f)
+    ham_voc = build_voc(keepham)
+    spam_voc = build_voc(keepspam)
     terms, idf = feature_selection(ham_voc, spam_voc, len(ham), len(spam))
     #write idf scores on memory in the form of a json file
+
     with open(os.path.join(os.getcwd(),'idf_terms.json'), 'w') as f:
         json.dump(idf, f)
 
