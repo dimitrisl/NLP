@@ -3,9 +3,11 @@ import os
 import numpy
 from vectorizer import feature_vector
 from sklearn.linear_model import LogisticRegression
-from sklearn.naive_bayes import GaussianNB
+from sklearn.naive_bayes import MultinomialNB
 from sklearn import metrics
+import time
 
+start = time.time()
 
 train_ham_path = os.path.join(os.path.dirname(__file__), "training", "ham")
 train_spam_path = os.path.join(os.path.dirname(__file__), "training", "spam")
@@ -45,9 +47,10 @@ test_predicted_lg = logisticregr_model.predict(test_x)
 print(metrics.classification_report(test_y, test_predicted_lg, digits=3))
 
 #Naive Bayes
-gausbay_model= GaussianNB()
-gausbay_model.fit(train_x,train_y)
+mgausbay_model= MultinomialNB()
+mgausbay_model.fit(train_x,train_y)
 
-test_predicted_gb= gausbay_model.predict(test_x)
+test_predicted_gb= mgausbay_model.predict(test_x)
 
 print(metrics.classification_report(test_y,test_predicted_gb,digits=3))
+print "it lasted : ",time.time() - start
