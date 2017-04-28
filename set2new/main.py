@@ -6,6 +6,9 @@ from sklearn.linear_model import LogisticRegression
 from sklearn.naive_bayes import MultinomialNB
 from sklearn import metrics
 import time
+from graphics import plot_learning_curve
+from sklearn.model_selection import ShuffleSplit
+
 
 start = time.time()
 
@@ -37,7 +40,7 @@ test_y=numpy.concatenate((test_ham_y,test_spam_y), axis=0)
 #Logistic Regression
 
 logisticregr_model = LogisticRegression()
-logisticregr_model.fit(train_x,train_y) #training of logistic regression
+logisticregr_model.fit(train_x, train_y ) #training of logistic regression
 print logisticregr_model.score(train_x,train_y), train_y.mean()
 
 #prediction on test data using logistic regression
@@ -53,4 +56,17 @@ mgausbay_model.fit(train_x,train_y)
 test_predicted_gb= mgausbay_model.predict(test_x)
 
 print(metrics.classification_report(test_y,test_predicted_gb,digits=3))
-print "it lasted : ",time.time() - start
+print "it lasted : %s seconds"%(time.time() - start)
+
+#learning curves
+
+# Algorithm Dictionary
+estimators = {'LR':LogisticRegression(), 'NB':MultinomialNB()}
+
+for (name,estimator) in estimators.items():
+    title = "Learning Curves " + name
+    # Random permutation cross-validator
+    cv = ShuffleSplit(n_splits=3, test_size=0.2, random_state=0)
+    plt = plot_learning_curve(estimator, title, train_x, train_y, (0.1, 1.01), cv=cv, n_jobs=-1)
+
+    plt.show()
