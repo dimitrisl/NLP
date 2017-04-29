@@ -11,12 +11,9 @@ from vectorizer import feature_vector
 from sklearn.linear_model import LogisticRegression
 from sklearn.naive_bayes import MultinomialNB
 import time
-from graphics import plot_learning_curve,plotter
+from graphics import plot_learning_curve ,rpcurves
 from sklearn.model_selection import ShuffleSplit
-from sklearn.multiclass import OneVsRestClassifier
-from sklearn.metrics import precision_recall_curve
-from sklearn.metrics import average_precision_score
-from sklearn import metrics
+
 
 
 start = time.time()
@@ -51,44 +48,30 @@ test_y=numpy.concatenate((test_ham_y,test_spam_y), axis=0)
 logisticregr_model = LogisticRegression()
 logisticregr_model.fit(train_x, train_y ) #training of logistic regression
 
-#prediction on test data using logistic regression
-
-#test_predicted_lg = logisticregr_model.predict(test_x)
+#test_predicted_lg = logisticregr_model.predict(test_x) #prediction on test data using logistic regression
 
 #Naive Bayes
 mgausbay_model= MultinomialNB()
 mgausbay_model.fit(train_x,train_y)
 
-#test_predicted_gb= mgausbay_model.predict(test_x)
-
 #learning curves
 
 # Algorithm Dictionary
-estimators = {'LogisticRegression':logisticregr_model, 'NaiveBayes':mgausbay_model}
-
+estimators = {'LR':logisticregr_model, 'NB':mgausbay_model}
+predictions = {}
 for (name,estimator) in estimators.items():
     title = "Learning Curves " + name
     # Random permutation cross-validator
     cv = ShuffleSplit(n_splits=10, test_size=0.2, random_state=0)
-    plt = plot_learning_curve(estimator, title, test_x, estimator.predict(test_x), (0.1, 1.01), cv=cv, n_jobs=-1)
+    predictions[name] = estimator.predict(test_x)
+    plt = plot_learning_curve(estimator, title, test_x, predictions[name], (0.1, 1.01), cv=cv, n_jobs=-1)
     plt.show()
+    plt.savefig(name)
+    if estimator!=mgausbay_model:
+        plt2 = rpcurves(estimator,train_x,train_y,test_x,test_y)
+        plt2.show()
+        plt2.savefig(name+'rc')
 
-# for (name, estimator) in [("Logistic Regression",LogisticRegression())]:
-#
-#     # Fit model
-#     classifier = OneVsRestClassifier(estimator)
-#     y_score = classifier.fit(train_x, train_y).decision_function(test_x)
-#     #print y_score
-#     # # Compute Precision-Recall and plot curve
-#     precision = dict()
-#     recall = dict()
-#     average_precision = dict()
-#     precision, recall, _ = precision_recall_curve(test_y,y_score)
-#     average_precision = average_precision_score(test_y, y_score)
-#     # Compute micro-average ROC curve and ROC area
-#     precision["micro"], recall["micro"], _ = precision_recall_curve(test_y,y_score.ravel())
-#     average_precision["micro"] = average_precision_score(test_y, y_score,average="micro")
-#     draw = plotter(recall,precision,average_precision,name)
-#     draw.show()
+
 
 print "it lasted : %s seconds"%(time.time() - start)

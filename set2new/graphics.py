@@ -1,7 +1,17 @@
-from itertools import cycle
 import numpy as np
-import matplotlib.pyplot as plt
 from sklearn.model_selection import learning_curve
+import matplotlib.pyplot as plt
+import numpy as np
+from itertools import cycle
+from sklearn.linear_model import LogisticRegression
+from sklearn.naive_bayes import MultinomialNB
+
+from sklearn import svm, datasets
+from sklearn.metrics import precision_recall_curve
+from sklearn.metrics import average_precision_score
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import label_binarize
+from sklearn.multiclass import OneVsRestClassifier
 
 
 # Define learning curves plot function
@@ -35,33 +45,19 @@ def plot_learning_curve(estimator, title, X, y, ylim=None, cv=None,
     plt.legend(loc="best")
     return plt
 
-def plotter(recall,precision,average_precision,name):
+def rpcurves(estimator,X_train,y_train, X_test ,y_test):
+    colors = cycle(['navy', 'turquoise', 'darkorange', 'cornflowerblue', 'teal'])
+    lw = 2
+
+    classifier = OneVsRestClassifier(estimator)
+    y_score = classifier.fit(X_train,y_train).decision_function(X_test)
+    precision,recall,_ = precision_recall_curve(y_test,y_score)
     plt.clf()
-    plt.plot(recall["micro"], precision["micro"], color='navy',
-             label='micro-average Precision-recall curve (area = {0:0.2f})'
-                   ''.format(average_precision["micro"]))
+    plt.plot(recall, precision, lw=lw, color='navy',label='Precision-Recall curve')
     plt.xlabel('Recall')
     plt.ylabel('Precision')
     plt.ylim([0.0, 1.05])
     plt.xlim([0.0, 1.0])
-    plt.title('Precision-Recall {0}: AUC={1:0.2f}'.format(name, average_precision['micro']))
+    plt.title('Precision-Recall')
     plt.legend(loc="lower left")
-    plt.show()
-
-    # Plot Precision-Recall curve for each class
-    plt.clf()
-    plt.plot(recall["micro"], precision["micro"], color='navy',
-             label='micro-average Precision-recall curve (area = {0:0.2f})'
-                   ''.format(average_precision["micro"]))
-    for i, color in zip(range(3), ['red', 'green', 'blue']):
-        plt.plot(recall[i], precision[i], color=color,
-                 label='Precision-recall curve of class {0} (area = {1:0.2f})'
-                       ''.format(i, average_precision[i]))
-
-    plt.xlim([0.0, 1.0])
-    plt.ylim([0.0, 1.05])
-    plt.xlabel('Recall')
-    plt.ylabel('Precision')
-    plt.title('Extension of Precision-Recall curve to multi-class ({0})'.format(name))
-    plt.legend(loc="lower right")
     return plt
