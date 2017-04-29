@@ -34,3 +34,34 @@ def plot_learning_curve(estimator, title, X, y, ylim=None, cv=None,
 
     plt.legend(loc="best")
     return plt
+
+def plotter(recall,precision,average_precision,name):
+    plt.clf()
+    plt.plot(recall["micro"], precision["micro"], color='navy',
+             label='micro-average Precision-recall curve (area = {0:0.2f})'
+                   ''.format(average_precision["micro"]))
+    plt.xlabel('Recall')
+    plt.ylabel('Precision')
+    plt.ylim([0.0, 1.05])
+    plt.xlim([0.0, 1.0])
+    plt.title('Precision-Recall {0}: AUC={1:0.2f}'.format(name, average_precision['micro']))
+    plt.legend(loc="lower left")
+    plt.show()
+
+    # Plot Precision-Recall curve for each class
+    plt.clf()
+    plt.plot(recall["micro"], precision["micro"], color='navy',
+             label='micro-average Precision-recall curve (area = {0:0.2f})'
+                   ''.format(average_precision["micro"]))
+    for i, color in zip(range(3), ['red', 'green', 'blue']):
+        plt.plot(recall[i], precision[i], color=color,
+                 label='Precision-recall curve of class {0} (area = {1:0.2f})'
+                       ''.format(i, average_precision[i]))
+
+    plt.xlim([0.0, 1.0])
+    plt.ylim([0.0, 1.05])
+    plt.xlabel('Recall')
+    plt.ylabel('Precision')
+    plt.title('Extension of Precision-Recall curve to multi-class ({0})'.format(name))
+    plt.legend(loc="lower right")
+    return plt
