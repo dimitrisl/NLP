@@ -1,17 +1,15 @@
-# Tune the feature set and hyperparameters (e.g., regularization weight l) on a held-out part
-# of the training data or using a cross-validation (slide 25) on the training data.
-
 from datahandling import open_files_inpath
-import os
-import numpy
 from vectorizer import feature_vector
+from sklearn.utils import shuffle
 from sklearn.linear_model import LogisticRegression
 from sklearn.naive_bayes import MultinomialNB
-import time
 from graphics import plot_learning_curve, rpcurves
 from sklearn.model_selection import ShuffleSplit
-
-
+from sklearn import metrics
+from sklearn.model_selection import GridSearchCV
+import time
+import os
+import numpy
 
 start = time.time()
 
@@ -48,6 +46,8 @@ mgausbay_model= MultinomialNB()
 mgausbay_model.fit(train_x,train_y)
 
 #learning curves
+print(metrics.classification_report(test_y, mgausbay_model.predict(test_x) ,digits=3))
+print(metrics.classification_report(test_y, logisticregr_model.predict(test_x) ,digits=3))
 
 # Algorithm Dictionary
 estimators = {'LR':logisticregr_model, 'NB':mgausbay_model}
@@ -65,5 +65,24 @@ for (name,estimator) in estimators.items():
     plt2.savefig('%s-rc.png' % name, bbox_inches='tight')
     plt2.show()
     plt2.close()
+
+
+# Tune the feature set and hyperparameters (e.g., regularization weight l) on a held-out part
+# of the training data or using a cross-validation (slide 25) on the training data.
+
+param_grid = {'C': [0.001, 0.01, 0.1]}
+grid = GridSearchCV(LogisticRegression(), param_grid)
+X_shuf, Y_shuf = shuffle(train_x,train_y)
+grid.fit(X_shuf, Y_shuf)
+
+# Print best option
+print("Best options")
+print("=======================================")
+for param_name in sorted(param_grid.keys()):
+    print("%s: %r" % (param_name, grid.best_params_[param_name]))
+
+predicted = grid.predict(test_x)
+
+print(metrics.classification_report(test_y, predicted , digits =3))
 
 print "it lasted : %s seconds" % (time.time()-start)
