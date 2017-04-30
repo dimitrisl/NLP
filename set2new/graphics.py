@@ -1,20 +1,9 @@
-import numpy as np
 from sklearn.model_selection import learning_curve
 import matplotlib.pyplot as plt
 import numpy as np
-from itertools import cycle
-from sklearn.linear_model import LogisticRegression
-from sklearn.naive_bayes import MultinomialNB
-
-from sklearn import svm, datasets
 from sklearn.metrics import precision_recall_curve
-from sklearn.metrics import average_precision_score
-from sklearn.model_selection import train_test_split
-from sklearn.preprocessing import label_binarize
-from sklearn.multiclass import OneVsRestClassifier
 
 
-# Define learning curves plot function
 def plot_learning_curve(estimator, title, X, y, ylim=None, cv=None,
                         n_jobs=1, train_sizes=np.linspace(.1, 1.0, 10), scoring='f1_macro'):
     plt.figure()
@@ -45,19 +34,20 @@ def plot_learning_curve(estimator, title, X, y, ylim=None, cv=None,
     plt.legend(loc="best")
     return plt
 
-def rpcurves(estimator,X_train,y_train, X_test ,y_test):
-    colors = cycle(['navy', 'turquoise', 'darkorange', 'cornflowerblue', 'teal'])
-    lw = 2
 
-    classifier = OneVsRestClassifier(estimator)
-    y_score = classifier.fit(X_train,y_train).decision_function(X_test)
-    precision,recall,_ = precision_recall_curve(y_test,y_score)
+def rpcurves(estimator, test_ham_y, test_spam_y, test_ham, test_spam):
+    predict_ham = estimator.predict(test_ham)
+    predict_spam = estimator.predict(test_spam)
+    precision = {}
+    recall = {}
+    precision["ham"], recall["ham"], _ = precision_recall_curve(test_ham_y, predict_ham)
+    precision["spam"], recall["spam"], _ = precision_recall_curve(test_spam_y, predict_spam)
     plt.clf()
-    plt.plot(recall, precision, lw=lw, color='navy',label='Precision-Recall curve')
+    for i, color in zip(["ham","spam"], ['red','green']):
+        plt.plot(recall[i], precision[i], color=color,label='Precision-recall curve of class {0}'.format(i))
+    plt.xlim([0.0, 1.0])
+    plt.ylim([0.0, 1.05])
     plt.xlabel('Recall')
     plt.ylabel('Precision')
-    plt.ylim([0.0, 1.05])
-    plt.xlim([0.0, 1.0])
-    plt.title('Precision-Recall')
-    plt.legend(loc="lower left")
+    plt.legend(loc="lower right")
     return plt

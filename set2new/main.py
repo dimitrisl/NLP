@@ -1,8 +1,5 @@
-# Draw learning curves (slides 64, 67) with appropriate measures (e.g., accuracy, F1) and precision-recall curves
-# (slide 23). Include experimental results of appropriate baselines (e.g., majority classifiers).
-# Make sure that you use separate training and test data. Tune the feature set and hyperparameters
-# (e.g., regularization weight l) on a held-out part of the training data or using a
-# cross-validation (slide 25) on the training data.
+# Tune the feature set and hyperparameters (e.g., regularization weight l) on a held-out part
+# of the training data or using a cross-validation (slide 25) on the training data.
 
 from datahandling import open_files_inpath
 import os
@@ -11,7 +8,7 @@ from vectorizer import feature_vector
 from sklearn.linear_model import LogisticRegression
 from sklearn.naive_bayes import MultinomialNB
 import time
-from graphics import plot_learning_curve ,rpcurves
+from graphics import plot_learning_curve, rpcurves
 from sklearn.model_selection import ShuffleSplit
 
 
@@ -44,12 +41,8 @@ test_x=numpy.concatenate((test_ham_x,test_spam_x), axis=0)
 test_y=numpy.concatenate((test_ham_y,test_spam_y), axis=0)
 
 #Logistic Regression
-
 logisticregr_model = LogisticRegression()
 logisticregr_model.fit(train_x, train_y ) #training of logistic regression
-
-#test_predicted_lg = logisticregr_model.predict(test_x) #prediction on test data using logistic regression
-
 #Naive Bayes
 mgausbay_model= MultinomialNB()
 mgausbay_model.fit(train_x,train_y)
@@ -65,13 +58,12 @@ for (name,estimator) in estimators.items():
     cv = ShuffleSplit(n_splits=10, test_size=0.2, random_state=0)
     predictions[name] = estimator.predict(test_x)
     plt = plot_learning_curve(estimator, title, test_x, predictions[name], (0.1, 1.01), cv=cv, n_jobs=-1)
+    plt.savefig('%s.png' % name, bbox_inches='tight')
     plt.show()
-    plt.savefig(name)
-    if estimator!=mgausbay_model:
-        plt2 = rpcurves(estimator,train_x,train_y,test_x,test_y)
-        plt2.show()
-        plt2.savefig(name+'rc')
+    plt.close()
+    plt2 = rpcurves(estimator,test_ham_y, test_spam_y, test_ham_x, test_spam_x)
+    plt2.savefig('%s-rc.png' % name, bbox_inches='tight')
+    plt2.show()
+    plt2.close()
 
-
-
-print "it lasted : %s seconds"%(time.time() - start)
+print "it lasted : %s seconds" % (time.time()-start)
