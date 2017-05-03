@@ -2,6 +2,8 @@ from spacy.en import English
 from nltk.tokenize import sent_tokenize
 from collections import Counter
 from languagemodel import *
+from ldistance import get_dist
+
 
 nlp = English()
 with open('europarl.txt', 'r') as f:
