@@ -2,7 +2,7 @@ from spacy.en import English
 from nltk.tokenize import sent_tokenize
 from collections import Counter
 from languagemodel import *
-from ldistance import get_dist
+from spelling_corrector import levenstein
 
 
 nlp = English()
@@ -15,3 +15,5 @@ lexicon = Counter(words)
 lexicon = find_rare(lexicon)
 logprob_bigrams={}
 bigrams, logprob_bigrams = lpbigrams(words, lexicon)
+
+print levenstein('the',lexicon)

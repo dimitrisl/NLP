@@ -3,9 +3,9 @@ from nltk import ngrams
 
 
 def find_rare(diction):  # find and delete rare tokens from dictionary
-    for x in diction:
+    for x in diction.keys():
         if diction[x] < 10:
-            diction[x] = "*rare*"
+            del diction[x]
     return diction
 
 
@@ -21,13 +21,14 @@ def create_bigrams(words, lexicon):
     valid_unigrams = []
     valid_bigrams = []
     for i in words:
-        if lexicon[i.lower()] != "*rare*":
+        if i in lexicon.keys():
             valid_unigrams.append(i)
     bigrams = ngrams(words, 2)
 
     for x, y in bigrams:
-        if lexicon[x.lower()] != "*rare*" and lexicon[y.lower()] != "*rare*":
+        if x in lexicon.keys() and y in lexicon.keys():
             if valid_bigrams == []:
+                valid_bigrams.append(("#start0", "#start1"))
                 valid_bigrams.append(("#start1", x))
                 valid_bigrams.append((x, y))
             else:
