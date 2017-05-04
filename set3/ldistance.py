@@ -17,8 +17,8 @@ def get_dist(word1,word2):
         listoflists.append([i])
         listoflists[-1].extend([0 for k in range(len(word1))])
 
-    for x,w2 in enumerate(word2,1):
-        for y,w1 in enumerate(word1,1):
+    for x,w2 in enumerate(word2, 1):
+        for y,w1 in enumerate(word1, 1):
             listoflists[x][y] = count_distance(w1,w2,listoflists,x,y)
 
     return listoflists[-1][-1]
