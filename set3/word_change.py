@@ -1,26 +1,33 @@
 import random
 
 
-def alphabet_gen():
+def alphabet_gen(lt=""):
     from string import letters
-    letter = random.choice(letters)
+    all_l = letters
+    if lt:
+        all_l = letters.replace(lt, "")
+        letter = random.choice(all_l)
+    else:
+        letter = random.choice(all_l)
     return letter
 
 
 def change(word):
     methods = ["replace", "remove", "insert"]
     choice = random.choice(methods)
-    how_many = random.choice(range(1, len(word)-1))
+    how_many = random.choice(range(1, len(word)))
     word = list(word)
     if choice == "replace":
-        for times in range(how_many):
-            index = random.choice(range(len(word)))
-            word[index] = alphabet_gen()
+        indexes = random.sample(range(len(word)), how_many)
+        for index in indexes:
+            lt = word[index]
+            word[index] = alphabet_gen(lt)
     elif choice == "remove":
-        for times in range(how_many):
+        for i in xrange(how_many):
             index = random.choice(range(len(word)))
             del word[index]
     else:
-        word.append(alphabet_gen())
+        for i in xrange(how_many):
+            word.append(alphabet_gen())
     word = "".join(word)
     return word
