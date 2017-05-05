@@ -13,10 +13,17 @@ def alphabet_gen(lt=""):
 
 
 def change(word):
+
+    word = list(word)
     methods = ["replace", "remove", "insert"]
     choice = random.choice(methods)
-    how_many = random.choice(range(1, len(word)))
-    word = list(word)
+
+    if len(word) < 4:
+        how_many = 1
+    else:
+        how_many = random.choice(range(1, 3))
+        print choice
+
     if choice == "replace":
         indexes = random.sample(range(len(word)), how_many)
         for index in indexes:
@@ -31,3 +38,6 @@ def change(word):
             word.append(alphabet_gen())
     word = "".join(word)
     return word
+#
+# x = change("skateole")
+# print x
