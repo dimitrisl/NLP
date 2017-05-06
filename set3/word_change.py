@@ -22,7 +22,6 @@ def change(word):
         how_many = 1
     else:
         how_many = random.choice(range(1, 3))
-        print choice
 
     if choice == "replace":
         indexes = random.sample(range(len(word)), how_many)
@@ -38,6 +37,3 @@ def change(word):
             word.append(alphabet_gen())
     word = "".join(word)
     return word
-#
-# x = change("skateole")
-# print x

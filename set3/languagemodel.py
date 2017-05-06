@@ -27,7 +27,7 @@ def create_bigrams(words, lexicon):
 
     for x, y in bigrams:
         if x in lexicon.keys() and y in lexicon.keys():
-            if valid_bigrams == []:
+            if not valid_bigrams:
                 valid_bigrams.append(("#start0", "#start1"))
                 valid_bigrams.append(("#start1", x))
                 valid_bigrams.append((x, y))

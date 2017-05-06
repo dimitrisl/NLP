@@ -8,26 +8,61 @@ def levenstein(word, lexicon):
     for i in lexicon.keys():
         ldistance[i] = get_dist(word, i)
     min_val = min(ldistance.itervalues())
-    correct_word = [(word, k) for word, k in ldistance.iteritems() if k == min_val]
-    return correct_word[0]
+    correct_word = [(k, word) for word, k in ldistance.iteritems() if k == min_val]
+    correct_word.sort()
+    correct_word = [(y, x) for (x, y) in correct_word]
+    return correct_word[:5]
 
 
 def viterbidecoder(sentence, lexicon, logprob_bigrams):
-    V = {}
-    tokens = [token for token in word_tokenize(sentence)]
-    word, dist = levenstein(tokens[0], lexicon)
-    correct_sequence = ['#start0', "#start1"]
-    print word
-    correct_sequence.append(word)
-    V[0] = 0
-    V[1] = log(1/float(dist + 1.1)) + logprob_bigrams[(correct_sequence[0], correct_sequence[1])]
-    for i in range(2, len(tokens)):
-        next_word, dist = levenstein(tokens[i-1], lexicon)
-        correct_sequence.append(next_word)
-        if (correct_sequence[i-1], correct_sequence[i]) in logprob_bigrams.keys():
-            V[i] = log(1 / float(dist + 1.1)) + logprob_bigrams[(correct_sequence[i-1], correct_sequence[i])] + V[i-1]
-        else:
-            V[i] = log(1 / float(dist + 1.1)) + 1/float(len(lexicon)) + V[i - 1]
-    return correct_sequence, V
+    vit = dict()
+    correct_sequence = []
+    vit[(0, "#start1")] = log(1) # we decided to have the level of viterbi and the word as a tuple in a dict.
+    tokens = [token.lower() for token in word_tokenize(sentence) if token.isalnum()]
+    print tokens
+    possible_words = dict()
+    for level, token in enumerate(tokens,1):
+        possible_words[(level, token)] = levenstein(token, lexicon) # we get from 1 to 5 pairs of correct words and distances
+    wpl = dict()
+    minimum_word, minimum_prob = "#start1", vit[(0,"#start1")]
+    for level in range(1, len(tokens)+1):
+        words_per_level = []
+        distances_per_word = []
+        for x, y in possible_words.keys():
+            if x == level:
+                for word, distance in possible_words[(x, y)]:
+                    words_per_level.extend([word])
+                    distances_per_word.extend([distance])
+
+        wpl[level] = words_per_level
+        #at this point we have the valid words of in each level within the list words_per_level
+        #we now have to find the previous minimum and store the mininum word the sequence
+        for word, dist in zip(words_per_level, distances_per_word):
+            if (minimum_word,word) in logprob_bigrams.keys():
+                vit[(level, word)] = -log(dist+1) + logprob_bigrams[(minimum_word, word)] + minimum_prob
+            else:
+                vit[(level, word)] = -log(dist+1) + 1/float(len(lexicon)) + minimum_prob
+
+        #find the minimum of this level in order to feed the next loop
+        minimum_prob, minimum_word = vit[(level, words_per_level[0])], words_per_level[0]
+        for x, y in vit.keys():
+            for word in words_per_level:
+                if x == level and minimum_prob > vit[(level, word)]:
+                    minimum_prob = vit[(level, word)]
+                    minimum_word = y
+
+    #we have to iterate through each level to get the best sequence
+    pr = dict()
+    keep = dict()
+    for level in range(1, len(tokens)+1):
+        pr[level] = []
+        for lvl, tup in vit.keys():
+            if lvl == level:
+                pr[level].append((vit[(lvl, tup)], tup))
+        pr[level].sort()
+        keep[level] = pr[level][-1][0]
+        correct_sequence.append(pr[level][-1][1])
+
+    return correct_sequence, keep
 
 
