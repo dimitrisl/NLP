@@ -16,8 +16,9 @@ lexicon = Counter(words)
 lexicon = find_rare(lexicon)
 logprob_bigrams = {}
 bigrams, logprob_bigrams = lpbigrams(words, lexicon)
-given_sentence = " ".join([change(token) for token in word_tokenize(sentences[11])])
-print "the true sentence is : ", sentences[11]
+
+given_sentence = " ".join([change(token) for token in word_tokenize(sentences[22])])
+print "the true sentence is : ", sentences[22]
 print ("The sentence given was : "+given_sentence)
 correct, b = viterbidecoder(given_sentence, lexicon, logprob_bigrams)
 print correct

@@ -19,12 +19,11 @@ def viterbidecoder(sentence, lexicon, logprob_bigrams):
     correct_sequence = []
     vit[(0, "#start1")] = log(1) # we decided to have the level of viterbi and the word as a tuple in a dict.
     tokens = [token.lower() for token in word_tokenize(sentence) if token.isalnum()]
-    print tokens
     possible_words = dict()
     for level, token in enumerate(tokens,1):
         possible_words[(level, token)] = levenstein(token, lexicon) # we get from 1 to 5 pairs of correct words and distances
     wpl = dict()
-    minimum_word, minimum_prob = "#start1", vit[(0,"#start1")]
+    maximum_word, maximum_prob = "#start1", vit[(0,"#start1")]
     for level in range(1, len(tokens)+1):
         words_per_level = []
         distances_per_word = []
@@ -38,30 +37,32 @@ def viterbidecoder(sentence, lexicon, logprob_bigrams):
         #at this point we have the valid words of in each level within the list words_per_level
         #we now have to find the previous minimum and store the mininum word the sequence
         for word, dist in zip(words_per_level, distances_per_word):
-            if (minimum_word,word) in logprob_bigrams.keys():
-                vit[(level, word)] = -log(dist+1) + logprob_bigrams[(minimum_word, word)] + minimum_prob
+            if (maximum_word,word) in logprob_bigrams.keys():
+                vit[(level, word)] = -log(dist+1) + logprob_bigrams[(maximum_word, word)] + maximum_prob
             else:
-                vit[(level, word)] = -log(dist+1) + 1/float(len(lexicon)) + minimum_prob
+                vit[(level, word)] = -log(dist+1) + 1/float(len(lexicon)) + maximum_prob
 
         #find the minimum of this level in order to feed the next loop
-        minimum_prob, minimum_word = vit[(level, words_per_level[0])], words_per_level[0]
+        maximum_prob, maximum_word = vit[(level, words_per_level[0])], words_per_level[0]
         for x, y in vit.keys():
             for word in words_per_level:
-                if x == level and minimum_prob > vit[(level, word)]:
-                    minimum_prob = vit[(level, word)]
-                    minimum_word = y
+                if x == level and maximum_prob < vit[(level, word)]:
+                    maximum_prob = vit[(level, word)]
+                    maximum_word = y
 
     #we have to iterate through each level to get the best sequence
     pr = dict()
     keep = dict()
+
     for level in range(1, len(tokens)+1):
         pr[level] = []
         for lvl, tup in vit.keys():
             if lvl == level:
                 pr[level].append((vit[(lvl, tup)], tup))
-        pr[level].sort()
-        keep[level] = pr[level][-1][0]
-        correct_sequence.append(pr[level][-1][1])
+        pr[level].sort(reverse=True)
+        print pr[level]
+        keep[level] = pr[level][0][0]
+        correct_sequence.append(pr[level][0][1])
 
     return correct_sequence, keep
 
