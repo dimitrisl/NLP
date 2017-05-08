@@ -13,13 +13,14 @@ def alphabet_gen(lt=""):
 
 
 def change(word):
-
+    original = word
     word = list(word)
     methods = ["replace", "remove", "insert"]
     choice = random.choice(methods)
 
     if len(word) < 4:
         how_many = 1
+        choice = random.choice(["replace", "insert"])
     else:
         how_many = random.choice(range(1, 3))
 

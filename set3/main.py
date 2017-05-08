@@ -2,7 +2,7 @@ from spacy.en import English
 from nltk.tokenize import sent_tokenize
 from collections import Counter
 from languagemodel import *
-from spelling_corrector import viterbidecoder
+from spelling_corrector import viterbidecoder,baseline
 from word_change import change
 from nltk.tokenize import word_tokenize
 
@@ -17,9 +17,21 @@ lexicon = find_rare(lexicon)
 logprob_bigrams = {}
 bigrams, logprob_bigrams = lpbigrams(words, lexicon)
 
-given_sentence = " ".join([change(token) for token in word_tokenize(sentences[22])])
-print "the true sentence is : ", sentences[22]
-print ("The sentence given was : "+given_sentence)
+
+given_sentence = " ".join([change(token) for token in word_tokenize(sentences[11]) if token.isalnum()])
+print "the true sentence is : ", sentences[11]
+print "The sentence given was : %s" % given_sentence
 correct, b = viterbidecoder(given_sentence, lexicon, logprob_bigrams)
-print correct
-print b
+true = [str(token).lower() for token in word_tokenize(sentences[11]) if str(token).isalnum()]
+counter = 0
+for x, y in zip(true, correct):
+    if x == y:
+        counter += 1
+print "the similarity is %s per cent" % (100 * counter/len(correct))
+
+ct, b = baseline(given_sentence, lexicon, logprob_bigrams)
+counter = 0
+for x, y in zip(true, ct):
+    if x == y:
+        counter += 1
+print "the similarity of the baseline is %s per cent" % (100 * counter/len(ct))
