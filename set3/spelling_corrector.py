@@ -74,11 +74,13 @@ def baseline(sentence, lexicon, logprob_bigrams):
     correct_sequence.append(word)
     v[0] = 0
     v[1] = log(1/float(dist + 1.1)) + logprob_bigrams[(correct_sequence[0], correct_sequence[1])]
-    for i in range(2, len(tokens)):
+    for i in range(2, len(tokens)+1):
         next_word, dist = levenstein(tokens[i-1], lexicon)[0]
         correct_sequence.append(next_word)
         if (correct_sequence[i-1], correct_sequence[i]) in logprob_bigrams.keys():
             v[i] = log(1 / float(dist + 1.1)) + logprob_bigrams[(correct_sequence[i-1], correct_sequence[i])] + v[i-1]
         else:
             v[i] = log(1 / float(dist + 1.1)) + 1/float(len(lexicon)) + v[i - 1]
+    correct_sequence.remove("#start0")
+    correct_sequence.remove("#start1")
     return correct_sequence, v

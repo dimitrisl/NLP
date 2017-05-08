@@ -29,9 +29,12 @@ for x, y in zip(true, correct):
         counter += 1
 print "the similarity is %s per cent" % (100 * counter/len(correct))
 
+print "dynamic : ", correct
+
 ct, b = baseline(given_sentence, lexicon, logprob_bigrams)
 counter = 0
 for x, y in zip(true, ct):
     if x == y:
         counter += 1
 print "the similarity of the baseline is %s per cent" % (100 * counter/len(ct))
+print "greedy : ", ct
