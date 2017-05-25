@@ -8,8 +8,8 @@ def check_grammar(turn, word, ternary, non_ternary):
                 return line[0]#  the type!
     else:
         states = word.split(" ")
-        for symbol1, symbol2 in non_ternary:
-            if (states[0],states[1]) == (symbol1,symbol2) or (states[0],states[1]) == (symbol2,symbol1):
+        for symbol1, symbol2, symbol3 in non_ternary:
+            if (states[0], states[1]) == (symbol2,symbol3) or (states[0], states[1]) == (symbol3, symbol2):
                 return symbol1
     return states
 
