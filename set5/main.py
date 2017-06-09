@@ -25,7 +25,7 @@ def right_child(row, collumn, names, follow_trails):#get the coords
         print "left %s right %s" % (names[left1][left2], names[right1][right2])
         left_child(left1, left2, names, follow_trails)
         right_child(right1, right2, names, follow_trails)
-        
+
 
 
 def check_grammar(turn, word, ternary, non_ternary):
