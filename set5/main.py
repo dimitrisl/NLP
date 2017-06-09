@@ -1,5 +1,27 @@
 import numpy as np
+def left_child(i, j, matrix, trails): #get the coords
+    temp = trails[i][j]
+    if temp == "end":
+        print "leftmost", matrix[i][j]
+    else:
+        # then we have to guess that temp contains two lists [[a1,a2],[b1,b2]]
+        print "we are in left subtree",matrix[i][j]
+        [left1, left2], [right1, right2] = temp
+        print "left %s right %s" % (matrix[left1][left2],matrix[right1][right2])
+        left_child(left1, left2, matrix, trails)
+        right_child(right1, right2, matrix, trails)
 
+def right_child(i, j, matrix, trails): #get the coords
+    temp = trails[i][j]
+    if temp == "end":
+        print "rightmost", matrix[i][j]
+    else:
+        # then we have to guess that temp contains two lists [[a1,a2],[b1,b2]]
+        print "we are in right sub-tree",matrix[i][j]
+        [left1, left2], [right1, right2] = temp
+        print "left %s right %s" % (matrix[left1][left2], matrix[right1][right2])
+        right_child(right1, right2, matrix, trails)
+        left_child(left1, left2, matrix, trails)
 
 def check_grammar(turn, word, ternary, non_ternary):
     if turn == "first":
@@ -9,8 +31,6 @@ def check_grammar(turn, word, ternary, non_ternary):
     else:
         states = word.split(",")
         left = states[0]
-        print "left",left
-        print "right",states[1]
         right = states[1]
         goals = []
         for line in non_ternary:
@@ -39,6 +59,8 @@ rows = len(words)
 collumns = len(words)+1
 
 matrix = [["" for j in range(collumns)] for i in range(rows)]
+trails = [[[] for j in range(collumns)] for i in range(rows)]
+
 # matrix = np.chararray((rows, collumns), itemsize=15)
 # matrix[:] = " " #initialize
 
@@ -49,6 +71,7 @@ for j in range(0, collumns):
         if j > i:
             if i+1 == j:
                 matrix[i][j] = check_grammar("first", words[i], ternary, non_ternary)#check_grammar(words[i]) #first match
+                trails[i][j] = "end"
                 #check_grammar(words[0])
         else:
             matrix[i][j] = "X"
@@ -60,13 +83,26 @@ for j in range(1, collumns):
             concat = ""
             #check left
             for k in range(1, j):
-                if matrix[i][k] != "X" and matrix[k][j] != "X":
-                    concat = matrix[i][k] + "," + matrix[k][j]
-                    if matrix[i][j] == check_grammar("second", concat, ternary, non_ternary):
-                        matrix[i][j] = check_grammar("second", concat, ternary, non_ternary)
-                    else:
-                        matrix[i][j] += check_grammar("second", concat, ternary, non_ternary)
-                    print k, matrix[i][j]
+                if (matrix[i][k] != "X" and matrix[k][j] != "X") and (matrix[i][k] != "" and matrix[k][j] != ""):
+                        concat = matrix[i][k] + "," + matrix[k][j]
+                        if matrix[i][j] == check_grammar("second", concat, ternary, non_ternary):
+                            matrix[i][j] = check_grammar("second", concat, ternary, non_ternary)
+                        elif check_grammar("second", concat, ternary, non_ternary) != "":
+                            trails[i][j].extend([[i, k], [k, j]])
+                            matrix[i][j] += check_grammar("second", concat, ternary, non_ternary)
+
 for i in range(len(matrix)):
     print matrix[i]
-print matrix[1][-1]
+for i in range(len(trails)):
+    print trails[i]
+
+###follow the trails to get the syntactic tree
+tag = matrix[0][-1]# this is the first tag which is the S
+[a1, a2], [b1, b2]  = trails[0][-1]# these are the elements that created the S
+left_tag, right_tag = matrix[a1][a2], matrix[b1][b2]
+
+print "The sentence begins"
+print "S"
+
+left_child(a1, a2, matrix, trails)
+right_child(b1, b2, matrix, trails)
