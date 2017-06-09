@@ -1,27 +1,32 @@
-import numpy as np
-def left_child(i, j, matrix, trails): #get the coords
-    temp = trails[i][j]
-    if temp == "end":
-        print "leftmost", matrix[i][j]
-    else:
-        # then we have to guess that temp contains two lists [[a1,a2],[b1,b2]]
-        print "we are in left subtree",matrix[i][j]
-        [left1, left2], [right1, right2] = temp
-        print "left %s right %s" % (matrix[left1][left2],matrix[right1][right2])
-        left_child(left1, left2, matrix, trails)
-        right_child(right1, right2, matrix, trails)
+#import numpy as np
 
-def right_child(i, j, matrix, trails): #get the coords
-    temp = trails[i][j]
+
+def left_child(row, collumn, names, follow_trails):#get the coords
+    temp = follow_trails[row][collumn]
     if temp == "end":
-        print "rightmost", matrix[i][j]
+        print "leftmost", names[row][collumn]
     else:
         # then we have to guess that temp contains two lists [[a1,a2],[b1,b2]]
-        print "we are in right sub-tree",matrix[i][j]
+        print "we are in left subtree", names[row][collumn]
         [left1, left2], [right1, right2] = temp
-        print "left %s right %s" % (matrix[left1][left2], matrix[right1][right2])
-        right_child(right1, right2, matrix, trails)
-        left_child(left1, left2, matrix, trails)
+        print "left %s right %s" % (names[left1][left2], names[right1][right2])
+        left_child(left1, left2, names, follow_trails)
+        right_child(right1, right2, names, follow_trails)
+
+
+def right_child(row, collumn, names, follow_trails):#get the coords
+    temp = follow_trails[row][collumn]
+    if temp == "end":
+        print "rightmost", names[row][collumn]
+    else:
+        # then we have to guess that temp contains two lists [[a1,a2],[b1,b2]]
+        print "we are in right sub-tree", names[row][collumn]
+        [left1, left2], [right1, right2] = temp
+        print "left %s right %s" % (names[left1][left2], names[right1][right2])
+        left_child(left1, left2, names, follow_trails)
+        right_child(right1, right2, names, follow_trails)
+        
+
 
 def check_grammar(turn, word, ternary, non_ternary):
     if turn == "first":
@@ -37,6 +42,7 @@ def check_grammar(turn, word, ternary, non_ternary):
             if left == line[1] and right == line[2]:
                 goals.append(line[0])
         return ','.join(goals)
+
 
 def grammar():
     f = open("grammar")
@@ -65,7 +71,6 @@ trails = [[[] for j in range(collumns)] for i in range(rows)]
 # matrix[:] = " " #initialize
 
 ternary, non_ternary = grammar()
-validcoords = []
 for j in range(0, collumns):
     for i in range(rows):
         if j > i:
@@ -81,7 +86,6 @@ for j in range(1, collumns):
     for i in range(rows, -1, -1):
         if j > i+1:
             concat = ""
-            #check left
             for k in range(1, j):
                 if (matrix[i][k] != "X" and matrix[k][j] != "X") and (matrix[i][k] != "" and matrix[k][j] != ""):
                         concat = matrix[i][k] + "," + matrix[k][j]
@@ -90,16 +94,12 @@ for j in range(1, collumns):
                         elif check_grammar("second", concat, ternary, non_ternary) != "":
                             trails[i][j].extend([[i, k], [k, j]])
                             matrix[i][j] += check_grammar("second", concat, ternary, non_ternary)
-
+#show the cky array
 for i in range(len(matrix)):
     print matrix[i]
-for i in range(len(trails)):
-    print trails[i]
 
-###follow the trails to get the syntactic tree
-tag = matrix[0][-1]# this is the first tag which is the S
-[a1, a2], [b1, b2]  = trails[0][-1]# these are the elements that created the S
-left_tag, right_tag = matrix[a1][a2], matrix[b1][b2]
+#follow the trails to get the syntactic tree
+[a1, a2], [b1, b2] = trails[0][-1]#these are the elements that created the S
 
 print "The sentence begins"
 print "S"
