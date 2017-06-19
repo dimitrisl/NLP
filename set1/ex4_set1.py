@@ -138,9 +138,10 @@ for i in correct_trigrams_p.keys():
         false_sen = random_sentences(i,words)
         false_trigrams_p[i].append(prob_creator(false_sen,3,lp_tri1,len(set(words)))[1])
 
-for i in correct_bigrams_p[:10]:
+
+for i in correct_bigrams_p.keys()[:10]:
     print "Correct: ",correct_bigrams_p[i],"  False: ",false_bigrams_p[i]
-for i in correct_trigrams_p[:10]:
+for i in correct_trigrams_p.keys()[:10]:
     print "Correct: ",correct_trigrams_p[i],"   False: ",false_trigrams_p[i]
 
 given_word = random.choice(words)
